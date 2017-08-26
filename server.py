@@ -8,6 +8,7 @@ import threading
 import logging
 import errno
 import ship
+import time
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -83,6 +84,9 @@ class clientHandler():
 
    #handle the clients in the list
    def handleClients(self):
+
+      #Get start timr for the simulation
+      prev_time = time.perf_counter()
       while self.run:
          for cli in self.clientList:
             try:
@@ -93,7 +97,7 @@ class clientHandler():
                if clientInput:
                   logging.debug('received %s', repr(clientInput))
                   #handle user input as a player
-                  cli.player.readInput(clientInput)
+                  cli.player.readInput(cuaternionlientInput)
                   cli.changes = cli.player.tryCommand()
 
                #reply to client
@@ -104,6 +108,14 @@ class clientHandler():
                #remove client and restart loop
                self.removeClient(cli)
                break
+
+         #See if we need to run the simulation
+         dt = time.perf_counter() - prev_time
+         if dt > 0.05:
+            prev_time = time.perf_counter()
+            #Run the simulation
+            for cli in self.clientList:
+               cli.player.ship.simulate(dt)
 
 #setup server socket for connecting
 logging.info('opening socket')
