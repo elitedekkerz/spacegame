@@ -19,7 +19,7 @@ class ship():
    #Ships position
    position = np.array([0.0, 0.0, 0.0])
    #Vector for telling where the ship is facing
-   front = np.array([0.0, 0.0, 0.0])
+   heading = Quaternion(scalar=1.0, vector=[0.0, 0.0, 1.0]) 
    #Vector for telling  where ship is going
    velocity = np.array([0.0, 0.0, 0.0])
 
@@ -33,7 +33,8 @@ class ship():
       self.setCommands ={
          'radio':self.radio.set,
          'thrust':self.thrust,
-         'fthrust':self.fthrust
+         'fthrust':self.fthrust,
+         'rot':self.rot
       }
 
       #get functionality
@@ -57,8 +58,15 @@ class ship():
       return self.getCommands[data[1]](data)
 
    def simulate(self, dt):
+
+      thrust_acc = np.array([0.0, 0.0, (self.thruster_back * self.thruster_power_back)  / self.mass])
+      thrust_acc += np.array([0.0, 0.0, -(self.thruster_front * self.thruster_power_front)  / self.mass])
+
       acceleration = np.array([0.0, 0.0, 0.0])
-      acceleration[0] = (self.thruster_back * self.thruster_power_back - self.thruster_front * self.thruster_power_front) / self.mass
+      acceleration += self.heading.rotate(thrust_acc)
+
+      print (thrust_acc, self.heading, self.heading.degrees, self.heading.axis, acceleration)
+
       self.velocity += acceleration * dt
       self.position += self.velocity * dt
 
@@ -80,3 +88,20 @@ class ship():
          return "Front thruster set to: {0}".format(self.thruster_front)
       except:
          return "Error. Usage: fthrust {float = 0.0 - 1.0}"
+
+   def rot(self,data):
+      try:
+         r = float(data[2])
+         r = r / 180.0 * np.pi
+         
+         print (self.heading)
+         print (self.heading.degrees)
+         print (self.heading.norm)
+         self.heading = Quaternion(axis=[1, 0, 0], angle=r) * self.heading
+         print (self.heading)
+         print (self.heading.degrees)
+         return "rotated by: {0}".format(r)
+
+      except:
+         return "Error. Usage: rot {float}"
+
