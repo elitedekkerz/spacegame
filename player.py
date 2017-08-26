@@ -6,7 +6,7 @@ class player():
    #player as a class which can send user input commands to a ship
 
    def __init__(self):
-      self.ship = ship.ship([0,0,0])
+      self.ship = ship.ship([0.0, 0.0, 0.0])
 
    #current command waiting for execution
    command = []

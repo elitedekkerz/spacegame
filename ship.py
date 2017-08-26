@@ -43,7 +43,7 @@ class ship():
       self.commands = {
          'echo':self.echo,
          'set':self.setCommand,
-         'get':self.getCommand
+         'get':self.getCommand,
          'thrust':self.thrust,
          'fthrust':self.fthrust
       }
@@ -67,7 +67,7 @@ class ship():
 
    def thrust(self,data):
       try:
-         val = float(data[0])
+         val = float(data[1])
          self.thruster_back = np.clip(val, 0, 1)
          return "Back thruster set to: {0}".format(self.thruster_back)
       except:
@@ -75,7 +75,7 @@ class ship():
    
    def fthrust(self,data):
       try:
-         val = float(data[0])
+         val = float(data[1])
          self.thruster_front = np.clip(val, 0, 1)
          return "Front thruster set to: {0}".format(self.thruster_front)
       except:
