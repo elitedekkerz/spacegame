@@ -16,10 +16,18 @@ class thrusters():
       self.ship = ship
 
    def simulate(self, dt):
+      thrust_acc = np.array([0.0, 0.0, (self.thruster_by_name['back'] * self.thruster_power_back)  / self.ship.mass])
+      thrust_acc += np.array([0.0, 0.0, -(self.thruster_by_name['front']* self.thruster_power_front)  / self.ship.mass])
+
+
       acceleration = np.array([0.0, 0.0, 0.0])
-      acceleration[0] = (self.thruster_by_name['back'] * self.thruster_power_back - self.thruster_by_name['front'] * self.thruster_power_front) / self.ship.mass
+      acceleration += self.ship.heading.rotate(thrust_acc)
+
+      print (thrust_acc, self.ship.heading, self.ship.heading.degrees, self.ship.heading.axis, acceleration)
+
       self.ship.velocity += acceleration * dt
       self.ship.position += self.ship.velocity * dt
+
 
    def set(self, args):
       try:

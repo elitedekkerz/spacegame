@@ -14,7 +14,7 @@ class ship():
    #Ships position
    position = np.array([0.0, 0.0, 0.0])
    #Vector for telling where the ship is facing
-   front = np.array([0.0, 0.0, 0.0])
+   heading = Quaternion(scalar=1.0, vector=[0.0, 0.0, 1.0]) 
    #Vector for telling  where ship is going
    velocity = np.array([0.0, 0.0, 0.0])
 
@@ -33,7 +33,9 @@ class ship():
          #thrusters
          'thruster':self.thrusters.set,
          'thrust':self.thrusters.thrust,
-         'fthrust':self.thrusters.fthrust
+         'fthrust':self.thrusters.fthrust,
+
+         'rot':self.rot
       }
 
       #get functionality
@@ -70,10 +72,23 @@ class ship():
          return "unable to get {0}".format(data[1])
 
    def simulate(self, dt):
+
       self.thrusters.simulate(dt)
+
 
    def echo(self,data):
       return str.join(' ', data)
+
+   def rot(self,data):
+      try:
+         r = float(data[2])
+         r = r / 180.0 * np.pi
+         
+         self.heading = Quaternion(axis=[1, 0, 0], angle=r) * self.heading
+         return "rotated by: {0}".format(r)
+
+      except:
+         return "Error. Usage: rot {float}"
 
    def getPosition(self, args):
       return str(self.position)
