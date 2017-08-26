@@ -17,37 +17,19 @@ class ship():
    heading = Quaternion(scalar=1.0, vector=[0.0, 0.0, 1.0]) 
    #Vector for telling  where ship is going
    velocity = np.array([0.0, 0.0, 0.0])
+   thrust_acc = np.array([0.0, 0.0, 0.0])
+   
+   modules = {}
 
    def __init__(self):
       __init__(position)
 
    def __init__(self, position):
-      self.radio = commands.radio()
-      self.thrusters = commands.thrusters(self)
 
-      #set functionality
-      self.setCommands ={
-         #radio
-         'radio':self.radio.set,
-
-         #thrusters
-         'thruster':self.thrusters.set,
-         'thrust':self.thrusters.thrust,
-         'fthrust':self.thrusters.fthrust,
-
-         'rot':self.rot
-      }
-
-      #get functionality
-      self.getCommands ={
-         #radio
-         'radio':self.radio.get,
-
-         #thrusters
-         'thruster':self.thrusters.get,
-
-         #ship info
-         'position':self.getPosition
+      self.modules = {
+         "radio": commands.radio(),
+         "thrust_front": commands.thrusters(self, np.array([0.0, 0.0, -10000.0])),
+         "thrus_back": commands.thrusters(self, np.array([0.0, 0.0, 100000.0]))
       }
 
       #basic commands
@@ -55,25 +37,36 @@ class ship():
          'echo':self.echo,
          'set':self.setCommand,
          'get':self.getCommand,
+         'position':self.getPosition,
+         'rot':self.rot,
       }
 
       self.position = np.array(position)
 
    def setCommand(self, data):
       try:
-         return self.setCommands[data[1]](data)
+         return self.modules[data[1]].set(data)
       except:
          return "unable to set {0}".format(data[1])
 
    def getCommand(self, data):
       try:
-         return self.getCommands[data[1]](data)
+         return self.modules[data[1]].get(data)
       except:
          return "unable to get {0}".format(data[1])
 
    def simulate(self, dt):
 
-      self.thrusters.simulate(dt)
+      self.thrust_acc = np.array([0.0, 0.0, 0.0])
+
+      for module in self.modules:
+         self.modules[module].simulate(dt)
+
+      acceleration = np.array([0.0, 0.0, 0.0])
+      acceleration += self.heading.rotate(self.thrust_acc)
+
+      self.velocity += acceleration * dt
+      self.position += self.velocity * dt
 
 
    def echo(self,data):

@@ -11,3 +11,6 @@ class radio():
 
    def get(self, args):
       return str(self.volume)
+
+   def simulate(self,dt):
+      pass
