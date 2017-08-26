@@ -7,8 +7,11 @@ import socket
 import threading
 import logging
 import errno
-import ship
 import time
+
+#game modules
+import ship
+import player
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -20,7 +23,7 @@ class client():
       self.conn = conn
       self.address = address
       self.changes = ''
-      self.player = ship.player()
+      self.player = player.player()
    
    def __str__(self):
       return self.address[0]+":"+str(self.address[1])

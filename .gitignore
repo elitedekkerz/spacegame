@@ -1,0 +1,7 @@
+#dotfiles
+.*
+!/.gitignore
+
+#python files
+__pycache__
+*.pyc
