@@ -97,7 +97,7 @@ class clientHandler():
                if clientInput:
                   logging.debug('received %s', repr(clientInput))
                   #handle user input as a player
-                  cli.player.readInput(cuaternionlientInput)
+                  cli.player.readInput(clientInput)
                   cli.changes = cli.player.tryCommand()
 
                #reply to client
