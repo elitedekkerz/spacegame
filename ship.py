@@ -18,7 +18,7 @@ class ship():
       pass
 
    def echo(self,data):
-      return data[0]
+      return str.join(' ', data)
 
 class player():
    #player as a class which can send user input commands to a ship
