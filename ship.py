@@ -58,10 +58,16 @@ class ship():
       self.position = np.array(position)
 
    def setCommand(self, data):
-      return self.setCommands[data[1]](data)
+      try:
+         return self.setCommands[data[1]](data)
+      except:
+         return "unable to set {0}".format(data[1])
 
    def getCommand(self, data):
-      return self.getCommands[data[1]](data)
+      try:
+         return self.getCommands[data[1]](data)
+      except:
+         return "unable to get {0}".format(data[1])
 
    def simulate(self, dt):
       self.thrusters.simulate(dt)
