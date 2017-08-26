@@ -8,6 +8,6 @@ python3
 `nc <address> 1961`
   
 # todo #
-*rename clientHandler to simulation
-*create separate mainloop for simulation, handleClients should be called from
-*ship commands as separate modules
+- rename clientHandler to simulation
+- create separate mainloop for simulation, handleClients should be called from
+- ship commands as separate modules
