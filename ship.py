@@ -31,7 +31,9 @@ class ship():
 
       #set functionality
       self.setCommands ={
-         'radio':self.radio.set
+         'radio':self.radio.set,
+         'thrust':self.thrust,
+         'fthrust':self.fthrust
       }
 
       #get functionality
@@ -44,8 +46,6 @@ class ship():
          'echo':self.echo,
          'set':self.setCommand,
          'get':self.getCommand,
-         'thrust':self.thrust,
-         'fthrust':self.fthrust
       }
 
       self.position = np.array(position)
@@ -67,7 +67,7 @@ class ship():
 
    def thrust(self,data):
       try:
-         val = float(data[1])
+         val = float(data[2])
          self.thruster_back = np.clip(val, 0, 1)
          return "Back thruster set to: {0}".format(self.thruster_back)
       except:
@@ -75,7 +75,7 @@ class ship():
    
    def fthrust(self,data):
       try:
-         val = float(data[1])
+         val = float(data[2])
          self.thruster_front = np.clip(val, 0, 1)
          return "Front thruster set to: {0}".format(self.thruster_front)
       except:
