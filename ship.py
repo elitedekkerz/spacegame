@@ -1,20 +1,15 @@
 import numpy as np
 from pyquaternion import Quaternion
+import logging
 
 #game modules
 import commands.radio
+import commands.thrusters
 
 class ship():
    ##Ships physical properties
    #Mass in kg
    mass = 1000000.0
-   #Thruster powers in N
-   thruster_power_front = 100000.0
-   thruster_power_back = 1000000.0
-
-   #Ships current control settings
-   thruster_front = 0.0
-   thruster_back = 0.0
 
    #Ships position
    position = np.array([0.0, 0.0, 0.0])
@@ -28,16 +23,21 @@ class ship():
 
    def __init__(self, position):
       self.radio = commands.radio()
+      self.thrusters = commands.thrusters(self)
 
       #set functionality
       self.setCommands ={
+         #radio
          'radio':self.radio.set,
-         'thrust':self.thrust,
-         'fthrust':self.fthrust
+
+         #thrusters
+         'thrust':self.thrusters.thrust,
+         'fthrust':self.thrusters.fthrust
       }
 
       #get functionality
       self.getCommands ={
+         #radio
          'radio':self.radio.get
       }
 
@@ -57,26 +57,8 @@ class ship():
       return self.getCommands[data[1]](data)
 
    def simulate(self, dt):
-      acceleration = np.array([0.0, 0.0, 0.0])
-      acceleration[0] = (self.thruster_back * self.thruster_power_back - self.thruster_front * self.thruster_power_front) / self.mass
-      self.velocity += acceleration * dt
-      self.position += self.velocity * dt
+      self.thrusters.simulate(dt)
+      logging.debug("%s",str(self.position))
 
    def echo(self,data):
       return str.join(' ', data)
-
-   def thrust(self,data):
-      try:
-         val = float(data[2])
-         self.thruster_back = np.clip(val, 0, 1)
-         return "Back thruster set to: {0}".format(self.thruster_back)
-      except:
-         return "Error. Usage: thrust {float = 0.0 - 1.0}"
-   
-   def fthrust(self,data):
-      try:
-         val = float(data[2])
-         self.thruster_front = np.clip(val, 0, 1)
-         return "Front thruster set to: {0}".format(self.thruster_front)
-      except:
-         return "Error. Usage: fthrust {float = 0.0 - 1.0}"
