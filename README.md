@@ -1,10 +1,18 @@
+# description #
+this project is intended to make a game server with a minimal user interface.  
+
 # requirements #
 python3  
-  
+pip3  
+
 # start server #
-`./server.py`  
+```
+pip3 install -r requirements.txt
+./server.py
+```  
   
 # connect to server #
+just connect to a socket. for example with netcat:  
 `nc <address> 1961`
   
 # todo #
