@@ -2,7 +2,7 @@ requirements:
 python3  
   
 start server:  
-./server.py  
+`./server.py`  
   
 connect to server:  
-nc <address> 1961
+`nc <address> 1961`
