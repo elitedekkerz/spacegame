@@ -1,20 +1,15 @@
 import numpy as np
 from pyquaternion import Quaternion
+import logging
 
 #game modules
 import commands.radio
+import commands.thrusters
 
 class ship():
    ##Ships physical properties
    #Mass in kg
    mass = 1000000.0
-   #Thruster powers in N
-   thruster_power_front = 100000.0
-   thruster_power_back = 1000000.0
-
-   #Ships current control settings
-   thruster_front = 0.0
-   thruster_back = 0.0
 
    #Ships position
    position = np.array([0.0, 0.0, 0.0])
@@ -28,18 +23,31 @@ class ship():
 
    def __init__(self, position):
       self.radio = commands.radio()
+      self.thrusters = commands.thrusters(self)
 
       #set functionality
       self.setCommands ={
+         #radio
          'radio':self.radio.set,
-         'thrust':self.thrust,
-         'fthrust':self.fthrust,
+
+         #thrusters
+         'thruster':self.thrusters.set,
+         'thrust':self.thrusters.thrust,
+         'fthrust':self.thrusters.fthrust,
+
          'rot':self.rot
       }
 
       #get functionality
       self.getCommands ={
-         'radio':self.radio.get
+         #radio
+         'radio':self.radio.get,
+
+         #thrusters
+         'thruster':self.thrusters.get,
+
+         #ship info
+         'position':self.getPosition
       }
 
       #basic commands
@@ -52,56 +60,35 @@ class ship():
       self.position = np.array(position)
 
    def setCommand(self, data):
-      return self.setCommands[data[1]](data)
+      try:
+         return self.setCommands[data[1]](data)
+      except:
+         return "unable to set {0}".format(data[1])
 
    def getCommand(self, data):
-      return self.getCommands[data[1]](data)
+      try:
+         return self.getCommands[data[1]](data)
+      except:
+         return "unable to get {0}".format(data[1])
 
    def simulate(self, dt):
 
-      thrust_acc = np.array([0.0, 0.0, (self.thruster_back * self.thruster_power_back)  / self.mass])
-      thrust_acc += np.array([0.0, 0.0, -(self.thruster_front * self.thruster_power_front)  / self.mass])
+      self.thrusters.simulate(dt)
 
-      acceleration = np.array([0.0, 0.0, 0.0])
-      acceleration += self.heading.rotate(thrust_acc)
-
-      print (thrust_acc, self.heading, self.heading.degrees, self.heading.axis, acceleration)
-
-      self.velocity += acceleration * dt
-      self.position += self.velocity * dt
 
    def echo(self,data):
       return str.join(' ', data)
-
-   def thrust(self,data):
-      try:
-         val = float(data[2])
-         self.thruster_back = np.clip(val, 0, 1)
-         return "Back thruster set to: {0}".format(self.thruster_back)
-      except:
-         return "Error. Usage: thrust {float = 0.0 - 1.0}"
-   
-   def fthrust(self,data):
-      try:
-         val = float(data[2])
-         self.thruster_front = np.clip(val, 0, 1)
-         return "Front thruster set to: {0}".format(self.thruster_front)
-      except:
-         return "Error. Usage: fthrust {float = 0.0 - 1.0}"
 
    def rot(self,data):
       try:
          r = float(data[2])
          r = r / 180.0 * np.pi
          
-         print (self.heading)
-         print (self.heading.degrees)
-         print (self.heading.norm)
          self.heading = Quaternion(axis=[1, 0, 0], angle=r) * self.heading
-         print (self.heading)
-         print (self.heading.degrees)
          return "rotated by: {0}".format(r)
 
       except:
          return "Error. Usage: rot {float}"
 
+   def getPosition(self, args):
+      return str(self.position)
