@@ -31,6 +31,7 @@ class ship():
          'radio':self.radio.set,
 
          #thrusters
+         'thruster':self.thrusters.set,
          'thrust':self.thrusters.thrust,
          'fthrust':self.thrusters.fthrust
       }
@@ -38,7 +39,13 @@ class ship():
       #get functionality
       self.getCommands ={
          #radio
-         'radio':self.radio.get
+         'radio':self.radio.get,
+
+         #thrusters
+         'thruster':self.thrusters.get,
+
+         #ship info
+         'position':self.getPosition
       }
 
       #basic commands
@@ -58,7 +65,9 @@ class ship():
 
    def simulate(self, dt):
       self.thrusters.simulate(dt)
-      logging.debug("%s",str(self.position))
 
    def echo(self,data):
       return str.join(' ', data)
+
+   def getPosition(self, args):
+      return str(self.position)
