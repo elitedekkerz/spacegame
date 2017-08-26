@@ -1,6 +1,8 @@
-#!/usr/bin/python3
 import numpy as np
 from pyquaternion import Quaternion
+
+#game modules
+import commands.radio
 
 class ship():
    ##Ships physical properties
@@ -25,13 +27,34 @@ class ship():
       __init__(position)
 
    def __init__(self, position):
+      self.radio = commands.radio()
+
+      #set functionality
+      self.setCommands ={
+         'radio':self.radio.set
+      }
+
+      #get functionality
+      self.getCommands ={
+         'radio':self.radio.get
+      }
+
+      #basic commands
       self.commands = {
          'echo':self.echo,
+         'set':self.setCommand,
+         'get':self.getCommand
          'thrust':self.thrust,
          'fthrust':self.fthrust
       }
 
       self.position = np.array(position)
+
+   def setCommand(self, data):
+      return self.setCommands[data[1]](data)
+
+   def getCommand(self, data):
+      return self.getCommands[data[1]](data)
 
    def simulate(self, dt):
       acceleration = np.array([0.0, 0.0, 0.0])
