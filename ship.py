@@ -41,3 +41,19 @@ class ship():
 
    def echo(self,data):
       return str.join(' ', data)
+
+   def thrust(self,data):
+      try:
+         val = float(data[0])
+         self.thruster_back = np.clip(val, 0, 1)
+         return "Back thruster set to: {0}".format(self.thruster_back)
+      except:
+         return "Error. Usage: thrust {float = 0.0 - 1.0}"
+   
+   def fthrust(self,data):
+      try:
+         val = float(data[0])
+         self.thruster_front = np.clip(val, 0, 1)
+         return "Front thruster set to: {0}".format(self.thruster_front)
+      except:
+         return "Error. Usage: fthrust {float = 0.0 - 1.0}"
