@@ -69,8 +69,11 @@ class ship():
       self.position += self.velocity * dt
 
 
-   def echo(self,data):
-      return str.join(' ', data)
+   def echo(self,args):
+      try:
+         return str.join(' ', args[1:])
+      except:
+         return "Error. Usage: echo <message>"
 
    def rot(self,data):
       try:
