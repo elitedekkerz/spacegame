@@ -29,31 +29,10 @@ class ship():
       self.modules = {
          "radio": commands.radio(),
          "thrust_front": commands.thrusters(self, np.array([0.0, 0.0, -10000.0])),
-         "thrus_back": commands.thrusters(self, np.array([0.0, 0.0, 100000.0]))
+         "thrus_back": commands.thrusters(self, np.array([0.0, 0.0, 100000.0])),
+         "echo": commands.echo(),
       }
-
-      #basic commands
-      self.commands = {
-         'echo':self.echo,
-         'set':self.setCommand,
-         'get':self.getCommand,
-         'position':self.getPosition,
-         'rot':self.rot,
-      }
-
       self.position = np.array(position)
-
-   def setCommand(self, data):
-      try:
-         return self.modules[data[1]].set(data)
-      except:
-         return "unable to set {0}".format(data[1])
-
-   def getCommand(self, data):
-      try:
-         return self.modules[data[1]].get(data)
-      except:
-         return "unable to get {0}".format(data[1])
 
    def simulate(self, dt):
 
@@ -67,13 +46,6 @@ class ship():
 
       self.velocity += acceleration * dt
       self.position += self.velocity * dt
-
-
-   def echo(self,args):
-      try:
-         return str.join(' ', args[1:])
-      except:
-         return "Error. Usage: echo <message>"
 
    def rot(self,data):
       try:
