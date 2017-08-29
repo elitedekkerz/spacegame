@@ -10,6 +10,16 @@ class thrusters():
       self.thruster_power = power_vect
       self.set_value = 0.0
 
+   def parse(self, args):
+      commands = {
+      "set":self.set,
+      "get":self.get,
+      }
+      try:
+         return commands[args[1]](args)
+      except:
+         return "Error. Usage: thruster set {float = 0.0 - 1.0}"
+
    def simulate(self, dt):
       self.ship.thrust_acc += self.thruster_power / self.ship.mass * self.set_value
 

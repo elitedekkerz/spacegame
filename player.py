@@ -17,11 +17,12 @@ class player():
 
       #do command
       try:
-         output = self.ship.commands[self.command[0]](self.command)
+         output = self.ship.modules[self.command[0]].parse(self.command)
          logging.debug("executing command %s", str.join(' ', self.command))
          #command complete, remove it so we don't re-run it next time
          return output+'\n'
       except:
+         logging.exception("unable to parse command")
          return "unknwon command\n"
       finally:
          self.command = []
