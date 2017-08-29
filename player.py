@@ -15,7 +15,11 @@ class player():
       if not len(self.command):
          return ''
 
-      #do command
+      #help command
+      if self.command[0] == 'help':
+         return self.help()
+
+      #ship command
       try:
          output = self.ship.modules[self.command[0]].parse(self.command)
          logging.debug("executing command %s", str.join(' ', self.command))
@@ -43,3 +47,17 @@ class player():
 
          else:
             self.inputString += char
+
+   #provide basic help
+   def help(self):
+      commands =''
+      for key in self.ship.modules:
+         commands += key+"\n"
+      return ("\n"
+         "\\\\\\spacegame///\n"
+         "version ?.?.?\n"
+         "list of commands:\n\n"
+         + commands +
+         "\nfor more info, visit:\n"
+         "https://github.com/elitedekkerz/spacegame\n"
+      )
