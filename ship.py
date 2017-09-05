@@ -29,7 +29,7 @@ class ship():
       self.modules = {
          "radio": commands.radio(),
          "thrust_front": commands.thrusters(self, np.array([0.0, 0.0, -10000.0])),
-         "thrus_back": commands.thrusters(self, np.array([0.0, 0.0, 100000.0])),
+         "thrust_back": commands.thrusters(self, np.array([0.0, 0.0, 100000.0])),
          "rudder": commands.rudder(self, np.array([100000.0, 100000.0, 100000.0])),
          "echo": commands.echo(),
       }
