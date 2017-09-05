@@ -32,6 +32,7 @@ class ship():
          "thrust_back": commands.thrusters(self, np.array([0.0, 0.0, 100000.0])),
          "rudder": commands.rudder(self, np.array([100000.0, 100000.0, 100000.0])),
          "echo": commands.echo(),
+         "ship": commands.ship_info(self),
       }
       self.position = np.array(position)
 
@@ -48,16 +49,4 @@ class ship():
       self.velocity += acceleration * dt
       self.position += self.velocity * dt
 
-   def rot(self,data):
-      try:
-         r = float(data[2])
-         r = r / 180.0 * np.pi
-         
-         self.heading = Quaternion(axis=[1, 0, 0], angle=r) * self.heading
-         return "rotated by: {0}".format(r)
 
-      except:
-         return "Error. Usage: rot {float}"
-
-   def getPosition(self, args):
-      return str(self.position)
