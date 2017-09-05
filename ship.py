@@ -1,6 +1,7 @@
 import numpy as np
 from pyquaternion import Quaternion
 import logging
+from space_coordinate import space_coordinate as sc
 
 #game modules
 import commands.radio
@@ -12,7 +13,7 @@ class ship():
    mass = 1000000.0
 
    #Ships position
-   position = np.array([0.0, 0.0, 0.0])
+   position = sc([0, 0, 0])
    #Vector for telling where the ship is facing
    heading = Quaternion(scalar=1.0, vector=[0.0, 0.0, 1.0]) 
    #Vector for telling  where ship is going
@@ -34,7 +35,7 @@ class ship():
          "echo": commands.echo(),
          "ship": commands.ship_info(self),
       }
-      self.position = np.array(position)
+      self.position = sc(position)
 
    def simulate(self, dt):
 
@@ -47,6 +48,5 @@ class ship():
       acceleration += self.heading.rotate(self.thrust_acc)
 
       self.velocity += acceleration * dt
-      self.position += self.velocity * dt
-
-
+      dpos = self.velocity * dt
+      self.position += dpos
