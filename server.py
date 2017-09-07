@@ -13,7 +13,7 @@ import time
 import ship
 import player
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 class client():
    """
