@@ -13,6 +13,7 @@ class ship():
    ##Ships physical properties
    #Mass in kg
    mass = 1000000.0
+   name = 'Восток'
 
    #Ships position
    position = sc([0, 0, 0])

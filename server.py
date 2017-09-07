@@ -128,7 +128,9 @@ class clientHandler():
 
                   #return info client
                   if output:
-                     cli.update(output['output']+'\n')
+                     cli.update(output['output'])
+                     #send prompt to client
+                     cli.update('\n'+cli.player.name+'@'+cli.ship.name+':')
 
          #See if we need to run the simulation
          dt = time.perf_counter() - prev_time
