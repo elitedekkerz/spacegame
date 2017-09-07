@@ -34,16 +34,12 @@ class client():
       try:
          data = self.conn.recv(1024)
          if data:
-            return data.decode('utf-8', 'ignore')
+            return {'data':data.decode('utf-8', 'ignore')}
          else:
-            logging.info('no data received from %s', str(self))
-            raise Exception
+            return {'status':'disconnect'}
       except socket.error as e:
          if e.args[0] == errno.EWOULDBLOCK:
-            pass
-      except:
-         logging.exception('unable to get client input')
-         raise
+            return {}
    
    def update(self, output):
       #send known changes to client
@@ -105,25 +101,33 @@ class clientHandler():
       prev_time = time.perf_counter()
       while self.run:
          for cli in self.clientList:
-            try:
-               #get input from client
-               clientInput = cli.getInput()
-            except:
-               logging.exception('exception while handling client')
-               #remove client and restart loop
-               self.removeClient(cli)
-               break
+            #get input from client
+            for key, data in cli.getInput().items():
 
-            #do something
-            if clientInput:
-               logging.debug('received %s', repr(clientInput))
-               #handle user input as a player
-               output = cli.player.readInput(clientInput)
-               try:
-                  output.update({'output':cli.ship.modules[output['command'][0]].parse(output['command'])})
-               except:
-                  output.update({'output':self.help(cli)})
-               cli.update(output['output'])
+               #handle client disconnect
+               if key == 'status' and data  == 'disconnect':
+                  logging.info('client %s disconnected', cli)
+                  self.removeClient(cli)
+                  break
+
+               #handle received data
+               if key == 'data':
+                  logging.debug('received %s', repr(data))
+                  #give received data to player
+                  output = cli.player.readInput(data)
+
+                  #handle player commands
+                  args = output.get('command',[])
+                  cmd = args[0]
+                  #ship commands
+                  if cmd in cli.ship.modules:
+                     output.update({'output':cli.ship.parse(args)})
+                     break
+                  else:
+                     logging.info('%s doesn\'t know what to do', cli)
+                     output.update({'output':self.help(cli)})
+
+                  cli.update(output.get('output'))
 
          #See if we need to run the simulation
          dt = time.perf_counter() - prev_time

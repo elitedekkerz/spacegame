@@ -7,6 +7,8 @@ from space_coordinate import space_coordinate as sc
 import commands.radio
 import commands.thrusters
 
+logger = logging.getLogger('ship')
+
 class ship():
    ##Ships physical properties
    #Mass in kg
@@ -36,6 +38,10 @@ class ship():
          "ship": commands.ship_info(self),
       }
       self.position = sc(position)
+
+   def parse(self, args):
+      logger.debug('forwarding command %s', str.(args))
+      self.modules[args[0]].parse(args)
 
    def simulate(self, dt):
 
