@@ -1,5 +1,7 @@
 import logging
 
+logger = logging.getLogger('radio')
+
 class radio():
    def __init__(self):
       self.volume = 0
@@ -12,15 +14,48 @@ class radio():
       try:
          return commands[args[1]](args)
       except:
-         return "Error. Usage: radio <set/get> <value>"
+         logger.debug('incorrect command %s', str.join(' ', args))
+         return self.help()
 
    def set(self, args):
-      self.volume = int(args[2])
-      logging.info("cranked the radio to %s", self.volume)
-      return ''
+      #get the new volume
+      try:
+         newVolume = float(args[2])
+      except:
+         return self.help()
+
+      #do some fancy calculations
+      volumeDifference = newVolume - self.volume
+      self.volume = newVolume
+      reply = 'The radio is now a little '
+      if volumeDifference > 0:
+         reply += 'louder.'
+      elif volumeDifference < 0:
+         reply += 'quieter.'
+      else:
+         reply = 'You try to adjust the radio, but nothing happens.'
+
+      logger.info("volume set to %s", self.volume)
+      return reply
 
    def get(self, args):
-      return str(self.volume)
+      logger.debug('volume info requested')
+      reply = 'the radio is '
+      if self.volume > 1:
+         reply += 'on fire'
+      elif self.volume > 0.5:
+         reply += 'on loud'
+      elif self.volume > 0:
+         reply += 'on'
+      elif self.volume <0:
+         reply += 'possibly broken'
+      else:
+         reply += 'off'
+      return reply
+
+   def help(self):
+      logger.info('who doesn\'t know how to work a radio?')
+      return "Error. Usage: radio <set/get> <value>"
 
    def simulate(self,dt):
       pass
