@@ -119,9 +119,18 @@ class clientHandler():
                   if 'command' in output:
                      args = output.get('command')
                      cmd = args[0] if args else 'help'
+
                      #ship commands
                      if cmd in cli.ship.modules:
                         output.update({'output':cli.ship.parse(args)})
+
+                     #disconnect commands
+                     elif cmd in ['quit', 'bye', 'exit']:
+                        cli.update('bye!\n')
+                        self.removeClient(cli)
+                        break
+
+                     #help
                      else:
                         logging.info('%s doesn\'t know what to do', cli)
                         output.update({'output':self.help(cli)})
