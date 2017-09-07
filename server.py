@@ -24,6 +24,7 @@ class client():
       self.address = address
       self.changes = ''
       self.player = player.player()
+      self.ship = ship.ship([0.0, 0.0, 0.0])
    
    def __str__(self):
       return self.address[0]+":"+str(self.address[1])
@@ -44,12 +45,10 @@ class client():
          logging.exception('unable to get client input')
          raise
    
-   def update(self):
+   def update(self, output):
       #send known changes to client
       try:
-         if self.changes:
-            self.conn.send(self.changes.encode('utf-8'))
-            self.changes = ''
+         self.conn.send(output.encode('utf-8'))
       except socket.error as e:
          if e.args[0] == errno.EWOULDBLOCK:
             pass
@@ -61,6 +60,20 @@ class clientHandler():
    clientList = []
    clientListLock = threading.Lock()
    run = False
+
+   #provide basic help
+   def help(self, client):
+      commands =''
+      for key in client.ship.modules:
+         commands += key+"\n"
+      return ("\n"
+         "\\\\\\spacegame///\n"
+         "version ?.?.?\n"
+         "list of commands:\n\n"
+         + commands +
+         "\nfor more info, visit:\n"
+         "https://github.com/elitedekkerz/spacegame\n"
+      )
 
    #add a client to the list
    def addClient(self, cli):
@@ -95,22 +108,22 @@ class clientHandler():
             try:
                #get input from client
                clientInput = cli.getInput()
-
-               #do something
-               if clientInput:
-                  logging.debug('received %s', repr(clientInput))
-                  #handle user input as a player
-                  cli.player.readInput(clientInput)
-                  cli.changes = cli.player.tryCommand()
-
-               #reply to client
-               cli.update()
-
             except:
                logging.exception('exception while handling client')
                #remove client and restart loop
                self.removeClient(cli)
                break
+
+            #do something
+            if clientInput:
+               logging.debug('received %s', repr(clientInput))
+               #handle user input as a player
+               output = cli.player.readInput(clientInput)
+               try:
+                  output.update({'output':cli.ship.modules[output['command'][0]].parse(output['command'])})
+               except:
+                  output.update({'output':self.help(cli)})
+               cli.update(output['output'])
 
          #See if we need to run the simulation
          dt = time.perf_counter() - prev_time
@@ -118,7 +131,7 @@ class clientHandler():
             prev_time = time.perf_counter()
             #Run the simulation
             for cli in self.clientList:
-               cli.player.ship.simulate(dt)
+               cli.ship.simulate(dt)
 
 #setup server socket for connecting
 logging.info('opening socket')
