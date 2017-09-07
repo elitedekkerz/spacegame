@@ -118,7 +118,7 @@ class clientHandler():
                   #handle player commands
                   if 'command' in output:
                      args = output.get('command')
-                     cmd = args[0]
+                     cmd = args[0] if args else 'help'
                      #ship commands
                      if cmd in cli.ship.modules:
                         output.update({'output':cli.ship.parse(args)})
