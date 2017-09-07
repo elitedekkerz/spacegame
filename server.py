@@ -24,7 +24,10 @@ class client():
       self.address = address
       self.changes = ''
       self.player = player.player()
-      self.ship = ship.ship([0.0, 0.0, 0.0])
+
+   #move client to ship
+   def joinShip(self, ship):
+      self.ship = ship
    
    def __str__(self):
       return self.address[0]+":"+str(self.address[1])
@@ -54,6 +57,7 @@ class client():
 class clientHandler():
    #a list for all the connected clients
    clientList = []
+   ships = {}
    clientListLock = threading.Lock()
    run = False
 
@@ -76,6 +80,8 @@ class clientHandler():
       with self.clientListLock:
          logging.info('client %s connected',str(cli))
          cli.conn.setblocking(0)
+         newShip = ship.ship([0.0, 0.0, 0.0])
+         cli.joinShip(newShip)
          self.clientList.append(cli)
   
    #remove a client from the list 
@@ -93,6 +99,48 @@ class clientHandler():
    #stop client handling thread
    def stop(self):
       self.run = False
+
+   def config(self, cli, args):
+      logging.debug('%s is configurig with args: %s', cli, str(args))
+      try:
+         #set player name
+         if args[1] == 'name':
+            cli.player.name = str.join(' ',args[2:])
+            logging.info('%s is now known as %s', cli, cli.player.name)
+            return 'your name is now '+cli.player.name
+
+         #ship
+         if args[1] == 'ship':
+            shipName = str.join(' ', args[3:])
+
+            #set ship name
+            if args[2] == 'name':
+               #make sure ship isn't named and name is available
+               for name, ship in self.ships.items():
+                  if name == shipName:
+                     return 'sorry, that name is already taken'
+                  if ship == cli.ship:
+                     return 'your ship is already named '+name
+
+               #name ship and add it to the list of ships
+               self.ships.update({shipName:cli.ship})
+               cli.ship.name = shipName
+               logging.info('%s named their ship %s', cli.player.name, cli.ship.name)
+               return 'you crudely engrave "' + shipName + '" on the side of your vessel'
+
+            #join ship
+            if args[2] == 'join':
+               try:
+                  cli.ship = self.ships[shipName]
+                  logging.info('%s, joined %s', cli.player.name, cli.ship.name)
+                  return 'you have joined the crew of '+shipName
+               except:
+                  return 'that ship doesn\'t exist'
+            return 'unknown ship configuration command'
+         return 'unknown configuration command'
+      except:
+         logging.exception('can\'t handle client config request')
+         return 'invalid config command, read the documentation'
 
    #handle the clients in the list
    def handleClients(self):
@@ -124,6 +172,10 @@ class clientHandler():
                      if cmd in cli.ship.modules:
                         output.update({'output':cli.ship.parse(args)})
 
+                     #configurations
+                     elif cmd == 'config':
+                        output.update({'output':self.config(cli, args)})
+
                      #disconnect commands
                      elif cmd in ['quit', 'bye', 'exit']:
                         cli.update('bye!\n')
@@ -136,7 +188,7 @@ class clientHandler():
                         output.update({'output':self.help(cli)})
 
                   #return info client
-                  if output:
+                  if output.get('output'):
                      cli.update(output['output'])
                      #send prompt to client
                      cli.update('\n'+cli.player.name+'@'+cli.ship.name+':')
