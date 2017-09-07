@@ -6,6 +6,7 @@ logger = logging.getLogger('player')
 
 class player():
    #player as a class which can send user input commands to a ship
+   name = 'Yuri'
 
    #string for collecting command
    inputString = ''
