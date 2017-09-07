@@ -40,8 +40,10 @@ class ship():
       self.position = sc(position)
 
    def parse(self, args):
-      logger.debug('forwarding command %s', str.(args))
-      self.modules[args[0]].parse(args)
+      logger.debug('forwarding command %s', str(args))
+      reply = self.modules[args[0]].parse(args)
+      logger.debug('received data %s', reply)
+      return reply
 
    def simulate(self, dt):
 
