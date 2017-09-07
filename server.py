@@ -106,7 +106,6 @@ class clientHandler():
 
                #handle client disconnect
                if key == 'status' and data  == 'disconnect':
-                  logging.info('client %s disconnected', cli)
                   self.removeClient(cli)
                   break
 
@@ -117,17 +116,19 @@ class clientHandler():
                   output = cli.player.readInput(data)
 
                   #handle player commands
-                  args = output.get('command',[])
-                  cmd = args[0]
-                  #ship commands
-                  if cmd in cli.ship.modules:
-                     output.update({'output':cli.ship.parse(args)})
-                     break
-                  else:
-                     logging.info('%s doesn\'t know what to do', cli)
-                     output.update({'output':self.help(cli)})
+                  if 'command' in output:
+                     args = output.get('command')
+                     cmd = args[0]
+                     #ship commands
+                     if cmd in cli.ship.modules:
+                        output.update({'output':cli.ship.parse(args)})
+                     else:
+                        logging.info('%s doesn\'t know what to do', cli)
+                        output.update({'output':self.help(cli)})
 
-                  cli.update(output.get('output'))
+                  #return info client
+                  if output:
+                     cli.update(output['output']+'\n')
 
          #See if we need to run the simulation
          dt = time.perf_counter() - prev_time
