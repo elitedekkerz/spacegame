@@ -10,12 +10,20 @@ class radio():
       commands = {
       "set":self.set,
       "get":self.get,
+      "on":self.on,
+      "off":self.off,
       }
       try:
          return commands[args[1]](args)
       except:
          logger.debug('incorrect command %s', str.join(' ', args))
          return self.help()
+
+   def on(self,args):
+      return self.set(['','','0.3'])
+
+   def off(self,args):
+      return self.set(['','','0'])
 
    def set(self, args):
       #get the new volume
@@ -55,7 +63,7 @@ class radio():
 
    def help(self):
       logger.info('who doesn\'t know how to work a radio?')
-      return "Error. Usage: radio <set/get> <value>"
+      return "Error. Usage: radio <set/get/on/off> <value>"
 
    def simulate(self,dt):
       pass
