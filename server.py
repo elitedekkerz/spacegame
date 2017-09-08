@@ -200,6 +200,8 @@ class clientHandler():
             #Run the simulation
             for cli in self.clientList:
                cli.ship.simulate(dt)
+         else:
+            time.sleep(0.05-dt)
 
 #setup server socket for connecting
 logging.info('opening socket')
