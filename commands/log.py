@@ -24,7 +24,8 @@ class log():
       lengthSum = len(self.data + inData)
       if lengthSum > self.size:
          self.data += inData[-self.size:]
-      self.data += inData
+      else:
+         self.data += inData
       logger.info('log updated: %s', inData[:-1])
       return 'done.'
 
