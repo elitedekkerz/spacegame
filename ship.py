@@ -38,6 +38,7 @@ class ship():
          "echo": commands.echo(),
          "ship": commands.ship_info(self),
          "log": commands.log(),
+         "time": commands.timer(),
       }
       self.position = sc(position)
 
