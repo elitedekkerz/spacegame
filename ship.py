@@ -37,6 +37,7 @@ class ship():
          "rudder": commands.rudder(self, np.array([100000.0, 100000.0, 100000.0])),
          "echo": commands.echo(),
          "ship": commands.ship_info(self),
+         "log": commands.log(),
       }
       self.position = sc(position)
 
