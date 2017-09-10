@@ -23,7 +23,7 @@ class log():
       inData = str.join(' ', args[2:])+'\n'
       lengthSum = len(self.data + inData)
       if lengthSum > self.size:
-         self.data += inData[-self.size:]
+         self.data = (self.data+inData)[-self.size:]
       else:
          self.data += inData
       logger.info('log updated: %s', inData[:-1])
