@@ -150,48 +150,52 @@ class clientHandler():
       while self.run:
          for cli in self.clientList:
             #get input from client
-            for key, data in cli.getInput().items():
+            try: 
+                for key, data in cli.getInput().items():
 
-               #handle client disconnect
-               if key == 'status' and data  == 'disconnect':
-                  self.removeClient(cli)
-                  break
+                   #handle client disconnect
+                   if key == 'status' and data  == 'disconnect':
+                      self.removeClient(cli)
+                      break
 
-               #handle received data
-               if key == 'data':
-                  logging.debug('received %s', repr(data))
-                  #give received data to player
-                  output = cli.player.readInput(data)
+                   #handle received data
+                   if key == 'data':
+                      logging.debug('received %s', repr(data))
+                      #give received data to player
+                      output = cli.player.readInput(data)
 
-                  #handle player commands
-                  if 'command' in output:
-                     args = output.get('command')
-                     cmd = args[0] if args else 'help'
+                      #handle player commands
+                      if 'command' in output:
+                         args = output.get('command')
+                         cmd = args[0] if args else 'help'
 
-                     #ship commands
-                     if cmd in cli.ship.modules:
-                        output.update({'output':cli.ship.parse(args)})
+                         #ship commands
+                         if cmd in cli.ship.modules:
+                            output.update({'output':cli.ship.parse(args)})
 
-                     #configurations
-                     elif cmd == 'config':
-                        output.update({'output':self.config(cli, args)})
+                         #configurations
+                         elif cmd == 'config':
+                            output.update({'output':self.config(cli, args)})
 
-                     #disconnect commands
-                     elif cmd in ['quit', 'bye', 'exit']:
-                        cli.update('bye!\n')
-                        self.removeClient(cli)
-                        break
+                         #disconnect commands
+                         elif cmd in ['quit', 'bye', 'exit']:
+                            cli.update('bye!\n')
+                            self.removeClient(cli)
+                            break
 
-                     #help
-                     else:
-                        logging.info('%s doesn\'t know what to do', cli)
-                        output.update({'output':self.help(cli)})
+                         #help
+                         else:
+                            logging.info('%s doesn\'t know what to do', cli)
+                            output.update({'output':self.help(cli)})
 
-                  #return info client
-                  if output.get('output'):
-                     cli.update(output['output'])
-                     #send prompt to client
-                     cli.update('\n'+cli.player.name+'@'+cli.ship.name+':')
+                      #return info client
+                      if output.get('output'):
+                         cli.update(output['output'])
+                         #send prompt to client
+                         cli.update('\n'+cli.player.name+'@'+cli.ship.name+':')
+            except AttributeError:
+                    logging.info('Client %s has unexpectedly quit.', str(cli))
+                    self.removeClient(cli)
 
          #See if we need to run the simulation
          dt = time.perf_counter() - prev_time
