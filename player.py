@@ -22,3 +22,4 @@ class player():
 
          else:
             self.inputString += char
+      return {}
