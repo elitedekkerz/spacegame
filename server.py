@@ -8,10 +8,12 @@ import threading
 import logging
 import errno
 import time
+import numpy as np
 
 #game modules
 import ship
 import player
+from gameObject import gameObject
 
 logging.basicConfig(level=logging.INFO)
 
@@ -94,6 +96,11 @@ class clientHandler():
    #start thread for client handling
    def start(self):
       self.run = True
+      #Create asteroids in 100 km radius 
+      for i in range(100):
+         pos = (np.random.rand(3) - 0.5) * 100000
+         newAsteroid = gameObject("ast", pos)
+
       threading.Thread(target=clients.handleClients,args=()).start()
 
    #stop client handling thread

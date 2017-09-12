@@ -35,6 +35,7 @@ class ship(gameObject):
          "ship": commands.ship_info(self),
          "log": commands.log(),
          "time": commands.timer(),
+         "radar": commands.radar(self),
       }
       super().__init__("ship", position)
 
