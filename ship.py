@@ -25,10 +25,7 @@ class ship():
    
    modules = {}
 
-   def __init__(self):
-      __init__(position)
-
-   def __init__(self, position):
+   def __init__(self, position = sc([0, 0, 0])):
 
       self.modules = {
          "radio": commands.radio(),
@@ -60,4 +57,4 @@ class ship():
 
       self.velocity += acceleration * dt
       dpos = self.velocity * dt
-      self.position += dpos
+      self.position += sc(dpos)
