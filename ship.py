@@ -2,6 +2,7 @@ import numpy as np
 from pyquaternion import Quaternion
 import logging
 from space_coordinate import space_coordinate as sc
+from gameObject import gameObject
 
 #game modules
 import commands.radio
@@ -9,14 +10,12 @@ import commands.thrusters
 
 logger = logging.getLogger('ship')
 
-class ship():
+class ship(gameObject):
    ##Ships physical properties
    #Mass in kg
    mass = 1000000.0
    name = 'Восток'
 
-   #Ships position
-   position = sc([0, 0, 0])
    #Vector for telling where the ship is facing
    heading = Quaternion(scalar=1.0, vector=[0.0, 0.0, 1.0]) 
    #Vector for telling  where ship is going
@@ -37,7 +36,7 @@ class ship():
          "log": commands.log(),
          "time": commands.timer(),
       }
-      self.position = sc(position)
+      super().__init__("ship", position)
 
    def parse(self, args):
       logger.debug('forwarding command %s', str(args))
