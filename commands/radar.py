@@ -35,9 +35,7 @@ class radar():
          if obj.getDistanceTo(self.ship) < self.range: 
             if obj != self.ship:
                dPos = obj.position - self.ship.position
-               x = dPos.position[0]
-               y = dPos.position[1]
-               z = dPos.position[2]
+               x, y, z = dPos.position
                class info:
                   identifier = obj.identifier
                   elevation = math.atan2(z,math.sqrt(x**2+y**2))*180/math.pi
