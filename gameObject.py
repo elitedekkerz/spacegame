@@ -23,6 +23,11 @@ class gameObject():
       objects.append(self)
       logging.info("New object: " + str(self))
 
+   def remove(self):
+      global objects
+      objects.remove(self)
+      logging.info("object removed: " + str(self))
+
    def getPosition(self):
       return self.position
    
