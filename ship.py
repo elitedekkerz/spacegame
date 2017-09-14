@@ -25,7 +25,6 @@ class ship(gameObject):
    modules = {}
 
    def __init__(self, position = sc([0, 0, 0])):
-
       self.modules = {
          "radio": commands.radio(),
          "thrust_front": commands.thrusters(self, np.array([0.0, 0.0, -10000.0])),
@@ -36,6 +35,7 @@ class ship(gameObject):
          "log": commands.log(),
          "time": commands.timer(),
          "radar": commands.radar(self),
+         "crew": commands.crew(self),
       }
       super().__init__("ship", position)
 

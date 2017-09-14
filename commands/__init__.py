@@ -6,3 +6,4 @@ from .ship_info import ship_info
 from .log import log
 from .timer import timer
 from .radar import radar
+from .crew import crew

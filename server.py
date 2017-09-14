@@ -26,10 +26,23 @@ class client():
       self.address = address
       self.changes = ''
       self.player = player.player()
+      self.ship = None
 
    #move client to ship
    def joinShip(self, ship):
+      try:
+         self.leaveShip()
+      except:
+         pass
       self.ship = ship
+      self.ship.crew.append(self.player)
+
+   def leaveShip(self):
+      self.ship.crew.remove(self.player)
+      #remove old ship if left empty
+      if len(self.ship.crew) < 1:
+         self.ship.destroy()
+      self.ship = None
    
    def __str__(self):
       return self.address[0]+":"+str(self.address[1])
@@ -82,7 +95,7 @@ class clientHandler():
       with self.clientListLock:
          logging.info('client %s connected',str(cli))
          cli.conn.setblocking(0)
-         newShip = ship.ship([0.0, 0.0, 0.0])
+         newShip = ship.ship()
          cli.joinShip(newShip)
          self.clientList.append(cli)
   
@@ -90,6 +103,7 @@ class clientHandler():
    def removeClient(self, cli):
       with self.clientListLock:
          logging.info('client %s disconnected', str(cli))
+         cli.leaveShip()
          cli.conn.close()
          self.clientList.remove(cli)
 
@@ -138,7 +152,7 @@ class clientHandler():
             #join ship
             if args[2] == 'join':
                try:
-                  cli.ship = self.ships[shipName]
+                  cli.joinShip(self.ships[shipName])
                   logging.info('%s, joined %s', cli.player.name, cli.ship.name)
                   return 'you have joined the crew of '+shipName
                except:
