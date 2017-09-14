@@ -41,7 +41,7 @@ class client():
       self.ship.crew.remove(self.player)
       #remove old ship if left empty
       if len(self.ship.crew) < 1:
-         self.ship.destroy()
+         self.ship.remove()
       self.ship = None
    
    def __str__(self):
