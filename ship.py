@@ -1,5 +1,4 @@
 import numpy as np
-from pyquaternion import Quaternion
 import logging
 from space_coordinate import space_coordinate as sc
 from gameObject import gameObject
@@ -16,8 +15,6 @@ class ship(gameObject):
    mass = 1000000.0
    name = 'Восток'
 
-   #Vector for telling where the ship is facing
-   heading = Quaternion(scalar=1.0, vector=[0.0, 0.0, 1.0]) 
    #Vector for telling  where ship is going
    velocity = np.array([0.0, 0.0, 0.0])
    thrust_acc = np.array([0.0, 0.0, 0.0])

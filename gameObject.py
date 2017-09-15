@@ -1,6 +1,7 @@
 
 import numpy as np
 import logging
+from pyquaternion import Quaternion
 from space_coordinate import space_coordinate as sc
 
 id_count = 0
@@ -9,6 +10,9 @@ objects = []
 class gameObject():
    position = sc([0, 0, 0])
    identifier = ""
+
+   #Vector for telling where the object is facing
+   heading = Quaternion() #(scalar=1.0, vector=[0.0, 0.0, 1.0]) 
 
    def __init__(self, id_prefix, pos = sc([0, 0, 0])):
       global id_count
@@ -37,6 +41,24 @@ class gameObject():
    def getAngleTo(self,target):
       dot = np.vdot(self.position.position, self.position.position)
       return dot / (self.position.abs * self.position.abs) 
+
+   def getSphericalCoordinateTo(self, target, inDeg = False):
+
+      #Move target position to ships origo
+      lpos = target.position - self.position
+      #Move the target to local coordinate
+      ltarget = self.heading.rotate(lpos.getPosition())
+      x, y, z = ltarget
+
+      distance = abs(lpos)
+      inclination = np.arccos(x / distance) - np.pi / 2
+      azimuth = np.arctan2(y, z)
+
+      if inDeg:
+         inclination *= 180 / np.pi
+         azimuth *= 180 / np.pi
+
+      return distance, azimuth, inclination
 
    def __str__(self):
       return self.identifier + ", " + str(self.position)
