@@ -34,19 +34,13 @@ class radar():
       for obj in gameObject.objects:
          if obj.getDistanceTo(self.ship) < self.range: 
             if obj != self.ship:
-               dPos = obj.position - self.ship.position
-               x, y, z = dPos.position
-               class info:
-                  identifier = obj.identifier
-                  elevation = math.atan2(z,math.sqrt(x**2+y**2))*180/math.pi
-                  azimuth = math.atan2(y,x)*180/math.pi
-                  distance = abs(dPos)
-               found_objects.append(info) 
+               found_objects.append(obj) 
 
-      found_objects.sort(key=lambda tup: tup.distance)
+      found_objects.sort(key=lambda tup: tup.getDistanceTo(self.ship))
 
       result = ""
       for i in found_objects:
-         result += "{}: {:06.3E} {:+06.1f} {:+06.1f}\n".format(i.identifier, i.distance, i.azimuth, i.elevation)
+         dist, azimuth, inclination = self.ship.getSphericalCoordinateTo(i, inDeg = True)
+         result += "{}: {:06.3E} {:+06.1f} {:+06.1f}\n".format(i.identifier, dist, azimuth, inclination)
 
       return result
