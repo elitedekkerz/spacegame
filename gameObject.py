@@ -38,9 +38,18 @@ class gameObject():
    def getDistanceTo(self, target):
       return abs(target.position - self.position)
 
-   def getAngleTo(self,target):
-      dot = np.vdot(self.position.position, self.position.position)
-      return dot / (self.position.abs * self.position.abs) 
+   def getAngleTo(self, target, inDeg = False):
+      #Move target position to ships origo
+      lpos = target.position - self.position
+      #Calculate the heading vector
+      heading_vect = self.heading.rotate([0.0, 0.0, 1.0])
+
+      dot = np.vdot(heading_vect, lpos.getPosition())
+      angle = np.arccos(dot / abs(lpos))
+      if inDeg:
+         angle *= 180 / np.pi
+
+      return angle
 
    def getSphericalCoordinateTo(self, target, inDeg = False):
 
