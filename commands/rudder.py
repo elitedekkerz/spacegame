@@ -32,9 +32,9 @@ class rudder():
       acc = (self.axis_power * self.axis_set) / (self.ship.mass * 100)
       self.axis_speed += acc * dt
       axis_pos = self.axis_speed * dt
-      rot = Quaternion(axis = [0, 1, 0], radians = axis_pos[0])
-      rot *= Quaternion(axis = [0, 0, 1], radians = axis_pos[1])
-      rot *= Quaternion(axis = [1, 0, 0], radians = axis_pos[2])
+      rot = Quaternion(axis = [1, 0, 0], radians = axis_pos[0])   #yaw
+      rot *= Quaternion(axis = [0, 0, 1], radians = axis_pos[1])  #roll
+      rot *= Quaternion(axis = [0, 1, 0], radians = axis_pos[2])  #pitch
       self.ship.heading = rot * self.ship.heading
       
 
