@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 #import server
 import gameObject
@@ -9,6 +10,7 @@ class radar():
 
    #Scan distance of the radar 
    range = 30000
+   sector = 180
 
    def __init__(self, ship):
       self.ship = ship
@@ -16,6 +18,7 @@ class radar():
    def parse(self, args):
       commands = {
       "scan":self.scan,
+      "sector":self.setSector,
       }
       try:
          return commands[args[1]](args)
@@ -31,8 +34,10 @@ class radar():
    def scan(self, args):
       found_objects = []
 
+      eff_range = self.range * (180 / self.sector)
+
       for obj in gameObject.objects:
-         if obj.getDistanceTo(self.ship) < self.range: 
+         if obj.getDistanceTo(self.ship) < eff_range and self.ship.getAngleTo(obj, True) < self.sector: 
             if obj != self.ship:
                found_objects.append(obj) 
 
@@ -44,3 +49,11 @@ class radar():
          result += "{}: {:06.3E} {:+06.1f} {:+06.1f}\n".format(i.identifier, dist, azimuth, inclination)
 
       return result
+
+   def setSector(self, args):
+      try:
+         self.sector = np.clip(float(args[2]), 0, 180)
+         return "sector set to: {0}".format(self.sector)
+      except:
+         logging.exception("exception when setting secotr value")
+         return "Error. Usage: radar sector {float = 0.0 ... 180.0}"
