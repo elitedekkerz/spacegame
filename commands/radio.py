@@ -67,3 +67,7 @@ class radio():
 
    def simulate(self, dt, power_factor):
       pass
+
+   def getPowerNeeded(self):
+      #The bass needs its power 
+      return 10 ** (7 ** self.volume)

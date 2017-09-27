@@ -11,7 +11,7 @@ class thrusters():
       self.set_value = 0.0
 
       #Watts needed for 1 newton
-      self.power_consumption = 100
+      self.power_consumption = 50
 
    def parse(self, args):
       commands = {

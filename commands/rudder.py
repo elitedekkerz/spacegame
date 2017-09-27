@@ -13,6 +13,9 @@ class rudder():
       self.axis_speed = np.array([0.0, 0.0, 0.0]) #Current rotation speed in radians/s
       self.dampening_p = 0 #Proportional part of dampening. TODO: Should this be debug only?
 
+      #Watts needed for 1 newton
+      self.power_consumption = 50
+
    def parse(self, args):
       commands = {
          "yaw":self.yaw,
@@ -38,7 +41,7 @@ class rudder():
          #axial accelration: a = F/(mr), assume ship is sphere with 100 radius
          acc = (self.axis_power * self.axis_set) / (self.ship.mass * 100)
 
-      self.axis_speed += acc * dt
+      self.axis_speed += acc * dt * power_factor
       axis_pos = self.axis_speed * dt
       rot = Quaternion(axis = [1, 0, 0], radians = axis_pos[0])   #yaw
       rot *= Quaternion(axis = [0, 0, 1], radians = axis_pos[1])  #roll
@@ -87,3 +90,6 @@ class rudder():
       except:
          logging.exception("exception when setting rudder value")
          return "Error. Usage: rudder damp {float >= 0.0 }"
+
+   def getPowerNeeded(self):
+      return self.power_consumption * np.linalg.norm(self.axis_power * self.axis_set)

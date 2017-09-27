@@ -24,8 +24,8 @@ class ship(gameObject):
    def __init__(self, position = sc([0, 0, 0])):
       self.modules = {
          "radio": commands.radio(),
-         "thrust_front": commands.thrusters(self, np.array([0.0, 0.0, -10000.0])),
-         "thrust_back": commands.thrusters(self, np.array([0.0, 0.0, 100000.0])),
+         "thrust_front": commands.thrusters(self, np.array([0.0, 0.0, -100000.0])),
+         "thrust_back": commands.thrusters(self, np.array([0.0, 0.0, 500000.0])),
          "rudder": commands.rudder(self, np.array([100000.0, 100000.0, 100000.0])),
          "echo": commands.echo(),
          "ship": commands.ship_info(self),
@@ -33,7 +33,7 @@ class ship(gameObject):
          "time": commands.timer(),
          "radar": commands.radar(self),
          "crew": commands.crew(self),
-         "generator": commands.generator(self, 5000000)
+         "generator": commands.generator(self, 25000000)
       }
       super().__init__("ship", position)
 
