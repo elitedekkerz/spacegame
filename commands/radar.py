@@ -60,11 +60,11 @@ class radar():
 
    def setSector(self, args):
       try:
-         self.sector = np.clip(float(args[2]), 0, 180)
+         self.sector = np.clip(float(args[2]), 1, 180)
          return "sector set to: {0}".format(self.sector)
       except:
          logging.exception("exception when setting secotr value")
-         return "Error. Usage: radar sector {float = 0.0 ... 180.0}"
+         return "Error. Usage: radar sector {float = 1.0 ... 180.0}"
 
    def powerOn(self, args):
       self.powered = True
