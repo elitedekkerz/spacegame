@@ -11,8 +11,7 @@ logger = logging.getLogger('ship')
 
 class ship(gameObject):
    ##Ships physical properties
-   #Mass in kg
-   mass = 1000000.0
+
    name = 'Восток'
 
    #Vector for telling  where ship is going

@@ -14,7 +14,7 @@ class gameObject():
    #Vector for telling where the object is facing
    heading = Quaternion() #(scalar=1.0, vector=[0.0, 0.0, 1.0]) 
 
-   def __init__(self, id_prefix, pos = sc([0, 0, 0])):
+   def __init__(self, id_prefix, pos = sc([0, 0, 0]), mass = 100000.0):
       global id_count
       if type(pos) == sc:
          self.position = pos
@@ -22,10 +22,14 @@ class gameObject():
          self.position = sc(pos)
 
       self.identifier = id_prefix + "-" + "%06i"%id_count
+      self.mass = mass
       id_count += 1
       global objects
       objects.append(self)
       logging.info("New object: " + str(self))
+
+   def __str__(self):
+      return self.identifier + ", " + str(self.position)
 
    def remove(self):
       global objects
@@ -69,5 +73,5 @@ class gameObject():
 
       return distance, azimuth, inclination
 
-   def __str__(self):
-      return self.identifier + ", " + str(self.position)
+   def getHeading(self):
+      return self.heading.rotate([0.0, 0.0, 1.0])
