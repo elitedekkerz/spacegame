@@ -1,4 +1,5 @@
 import logging
+import numpy as np
 
 logger = logging.getLogger('generator')
 
@@ -10,7 +11,7 @@ class generator():
 
    def parse(self, args):
       commands = {
-      "":self.get,
+      "get":self.get,
       "set":self.set,
       }
       try:
@@ -25,13 +26,13 @@ class generator():
       except:
          return self.help()
 
-      logger.info("rector set to %s", self.volume)
-      return ""
+      logger.info("rector set to %s", self.reactor_level)
+      return " "
 
    def get(self, args):
       logger.debug('rector info requested')
-      reply = "Reactor is set to %.0f" % self.reactor_level
-      reply += " and generates %.2f MW of power." %  self.reactor_level * self.max_power_output
+      reply = "Reactor is set to %.2f" % self.reactor_level
+      reply += " and generates %.2f kW of power." %  (self.reactor_level * self.max_power_output / 1000)
       return reply
 
    def help(self):
