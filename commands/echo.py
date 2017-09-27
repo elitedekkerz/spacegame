@@ -6,5 +6,5 @@ class echo():
       except:
          return "Error. Usage: echo <message>"
 
-   def simulate(self,dt):
+   def simulate(self, dt, power_factor):
       pass

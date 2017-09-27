@@ -40,5 +40,5 @@ class log():
    def help(self):
       return 'Error. usage: log <write <message>/read/clear>'
 
-   def simulate(self,dt):
+   def simulate(self, dt, power_factor):
       pass

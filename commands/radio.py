@@ -65,5 +65,5 @@ class radio():
       logger.info('who doesn\'t know how to work a radio?')
       return "Error. Usage: radio <set/get/on/off> <value>"
 
-   def simulate(self,dt):
+   def simulate(self, dt, power_factor):
       pass

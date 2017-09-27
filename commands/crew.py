@@ -6,7 +6,7 @@ class crew():
       self.ship = ship
       self.ship.crew = []
 
-   def simulate(self, dt):
+   def simulate(self, dt, power_factor):
       pass
 
    def parse(self, args):

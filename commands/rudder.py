@@ -28,7 +28,7 @@ class rudder():
       except:
          return "Error. Usage: rudder {yaw/roll/pitch} {float = -1.0 ... 1.0}"
 
-   def simulate(self, dt):
+   def simulate(self, dt, power_factor):
 
       #If no rotation is set go dampening mode 
       if(np.linalg.norm(self.axis_set) < 0.0001 and self.dampening_p != 0):

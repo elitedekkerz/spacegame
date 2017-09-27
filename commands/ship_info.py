@@ -16,13 +16,15 @@ class ship_info():
       "position":self.getPosition,
       "velocity":self.getVelocity,
       "heading":self.getHeading,
+      "power":self.getPower,
       }
       try:
          return commands[args[1]](args)
       except:
-         return "Error. Usage: ship position/velocity"
+         logging.exception("exception when running command")
+         return "Error. Usage: ship position/velocity/heading/power"
 
-   def simulate(self, dt):
+   def simulate(self, dt, power_factor):
       pass
 
    def getPosition(self, args):
@@ -36,3 +38,6 @@ class ship_info():
         return str(self.ship.heading.rotate(np.array([0.0, 0.0, 1.0])))
       except:
         logger.exception("Heading")
+
+   def getPower(self, args):
+      return str(self.ship.power_needed / 1000) + "/" + str(self.ship.power_generated / 1000) + " kW"

@@ -10,6 +10,9 @@ class thrusters():
       self.thruster_power = power_vect
       self.set_value = 0.0
 
+      #Watts needed for 1 newton
+      self.power_consumption = 100
+
    def parse(self, args):
       commands = {
       "set":self.set,
@@ -20,8 +23,8 @@ class thrusters():
       except:
          return "Error. Usage: thruster set {float = 0.0 - 1.0}"
 
-   def simulate(self, dt):
-      self.ship.thrust_acc += self.thruster_power / self.ship.mass * self.set_value
+   def simulate(self, dt, power_factor):
+      self.ship.thrust_acc += self.thruster_power / self.ship.mass * self.set_value * power_factor
 
    def set(self, args):
       try:
@@ -34,3 +37,6 @@ class thrusters():
 
    def get(self, args):
       return str(self.set_value)
+
+   def getPowerNeeded(self):
+      return self.set_value * self.power_consumption * np.linalg.norm(self.thruster_power)

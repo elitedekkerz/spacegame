@@ -33,21 +33,27 @@ class ship(gameObject):
          "time": commands.timer(),
          "radar": commands.radar(self),
          "crew": commands.crew(self),
+         "generator": commands.generator(self, 5000000)
       }
       super().__init__("ship", position)
 
    def parse(self, args):
       logger.debug('forwarding command %s', str(args))
-      reply = self.modules[args[0]].parse(args)
+      try:
+         reply = self.modules[args[0]].parse(args)
+      except:
+         logging.exception("exception when executing module: " + str(args[0]) + " with arguments:" + str(args[1:]))
+
       logger.debug('received data %s', reply)
       return reply
 
    def simulate(self, dt):
 
       self.thrust_acc = np.array([0.0, 0.0, 0.0])
+      power_factor = self.calc_power()
 
       for module in self.modules:
-         self.modules[module].simulate(dt)
+         self.modules[module].simulate(dt, power_factor)
 
       acceleration = np.array([0.0, 0.0, 0.0])
       acceleration += self.heading.rotate(self.thrust_acc)
@@ -55,3 +61,25 @@ class ship(gameObject):
       self.velocity += acceleration * dt
       dpos = self.velocity * dt
       self.position += sc(dpos)
+
+   def calc_power(self):
+      self.power_generated = 0
+      self.power_needed = 0
+
+      #Get power needs and power generation form all modules
+      for module in self.modules:
+         try:
+            self.power_generated += self.modules[module].getPowerGenerated()
+         except:
+            pass
+         try:
+            self.power_needed += self.modules[module].getPowerNeeded()
+         except:
+            pass
+
+      #If we generate more power than is needed all modules can run in full power.
+      #Else we calculate multiplier to limit the modules functionality
+      if self.power_needed < self.power_generated:
+         return 1.0
+      else:
+         return self.power_generated / self.power_needed
