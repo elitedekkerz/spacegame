@@ -26,3 +26,6 @@ alternatively, you can try a combination of these:
 - rename clientHandler to simulation
 - create separate mainloop for simulation, handleClients should be called from
 - user input should be automatically lowercased when received
+
+# bugs #
+- gemeObject.remove() appears to do nothing

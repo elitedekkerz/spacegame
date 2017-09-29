@@ -33,8 +33,11 @@ class gameObject():
 
    def remove(self):
       global objects
-      objects.remove(self)
-      logging.info("object removed: " + str(self))
+      try:
+         objects.remove(self)
+         logging.info("object removed: " + str(self))
+      except:
+         logging.exception("unable to remove self from objects")
 
    def getPosition(self):
       return self.position
