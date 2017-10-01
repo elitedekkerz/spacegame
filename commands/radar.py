@@ -64,6 +64,8 @@ class radar():
       try:
          self.sector = np.clip(float(args[2]), 1, 180)
          return "sector set to: {0}".format(self.sector)
+      except IndexError:
+         return "{0}".format(self.sector)
       except:
          logging.exception("exception when setting secotr value")
          return "Error. Usage: radar sector {float = 1.0 ... 180.0}"
