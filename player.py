@@ -18,7 +18,7 @@ class player():
             args = self.inputString.split()
             self.inputString = ''
             logger.debug("constructed command %s", str(args))
-            return {'command':args}
+            return args
 
          else:
             self.inputString += char
