@@ -40,18 +40,17 @@ class ship(gameObject):
       logger.debug('forwarding command %s', str(args))
       try:
          reply = self.modules[args[0]].parse(args)
+         logger.debug('received data %s', reply)
+         try:
+            if not isinstance(reply, str):
+               reply = reply[1]
+         except:
+            pass
+         return reply
+      except KeyError:
+         raise
       except:
          logging.exception("exception when executing module: " + str(args[0]) + " with arguments:" + str(args[1:]))
-
-      logger.debug('received data %s', reply)
-
-      try:
-         if not isinstance(reply, str):
-            reply = reply[1]
-      except:
-         pass
-
-      return reply
 
    def simulate(self, dt):
 

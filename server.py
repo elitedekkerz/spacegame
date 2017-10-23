@@ -17,6 +17,12 @@ from gameObject import gameObject
 
 logging.basicConfig(level=logging.INFO)
 
+try:
+   with open('./motd.txt', 'r') as f:
+      motd = f.read(1024)
+except:
+      motd = 'http://github.com/eliteDekkerz/spacegame'
+
 class client():
    """
    handles data from and to client
@@ -43,24 +49,21 @@ class client():
       if len(self.ship.crew) < 1:
          self.ship.remove()
       self.ship = None
-   
+
+   def parse(self, args):
+      try:
+         self.update(self.ship.parse(args))
+      except KeyError:
+         raise
+      except:
+         logging.exception("unable to parse %s", repr(args))
+
    def __str__(self):
       return self.address[0]+":"+str(self.address[1])
-
-   def getInput(self):
-      #non-blockingly receive data from client
-      try:
-         data = self.conn.recv(1024)
-         if data:
-            return {'data':data.decode('utf-8', 'ignore')}
-         else:
-            return {'status':'disconnect'}
-      except socket.error as e:
-         if e.args[0] == errno.EWOULDBLOCK:
-            return {}
    
-   def update(self, output):
+   def update(self, output=''):
       #send known changes to client
+      output +='\n'+self.player.name+'@'+self.ship.name+'>'
       try:
          self.conn.send(output.encode('utf-8'))
       except socket.error as e:
@@ -98,14 +101,15 @@ class clientHandler():
          newShip = ship.ship()
          cli.joinShip(newShip)
          self.clientList.append(cli)
+         cli.update(motd)
   
    #remove a client from the list 
    def removeClient(self, cli):
       with self.clientListLock:
-         logging.info('client %s disconnected', str(cli))
          cli.leaveShip()
          cli.conn.close()
          self.clientList.remove(cli)
+         logging.info('client %s removed', str(cli))
 
    #start thread for client handling
    def start(self):
@@ -172,48 +176,41 @@ class clientHandler():
          for cli in self.clientList:
             #get input from client
             try: 
-                for key, data in cli.getInput().items():
+               data = cli.conn.recv(1024).decode('utf-8', 'ignore')
 
-                   #handle client disconnect
-                   if key == 'status' and data  == 'disconnect':
-                      self.removeClient(cli)
-                      break
+               #parse received data via an external class for some reason
+               args = cli.player.readInput(data)
+               if not args:
+                  continue
 
-                   #handle received data
-                   if key == 'data':
-                      logging.debug('received %s', repr(data))
-                      #give received data to player
-                      output = cli.player.readInput(data)
+               #ship commands
+               try:
+                  cli.parse(args)
+                  continue
+               except KeyError:
+                  pass
 
-                      #handle player commands
-                      if 'command' in output:
-                         args = output.get('command')
-                         cmd = args[0] if args else 'help'
+               #configurations
+               if args[0] == 'config':
+                  try:
+                     cli.update(self.config(cli, args))
+                  except:
+                     logging.exception('unable configure client with %s', repr(args))
 
-                         #ship commands
-                         if cmd in cli.ship.modules:
-                            output.update({'output':cli.ship.parse(args)})
+               #disconnect commands
+               elif args[0] in ['quit', 'bye', 'exit']:
+                  logging.info('Client %s gracefully quit.', str(cli))
+                  cli.update('bye!\n')
+                  self.removeClient(cli)
+                  break
 
-                         #configurations
-                         elif cmd == 'config':
-                            output.update({'output':self.config(cli, args)})
-
-                         #disconnect commands
-                         elif cmd in ['quit', 'bye', 'exit']:
-                            cli.update('bye!\n')
-                            self.removeClient(cli)
-                            break
-
-                         #help
-                         else:
-                            logging.info('%s doesn\'t know what to do', cli)
-                            output.update({'output':self.help(cli)})
-
-                      #return info client
-                      if output.get('output'):
-                         cli.update(output['output'])
-                         #send prompt to client
-                         cli.update('\n'+cli.player.name+'@'+cli.ship.name+':')
+               #help
+               else:
+                  logging.info('%s doesn\'t know what to do', cli)
+                  cli.update(self.help(cli))
+            except socket.error as e:
+               if e.args[0] == errno.EWOULDBLOCK:
+                  pass
             except AttributeError:
                     logging.info('Client %s has unexpectedly quit.', str(cli))
                     self.removeClient(cli)
