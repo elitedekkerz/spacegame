@@ -36,22 +36,6 @@ class ship(gameObject):
       }
       super().__init__("ship", position)
 
-   def parse(self, args):
-      logger.debug('forwarding command %s', str(args))
-      try:
-         reply = self.modules[args[0]].parse(args)
-         logger.debug('received data %s', reply)
-         try:
-            if not isinstance(reply, str):
-               reply = reply[1]
-         except:
-            pass
-         return reply
-      except KeyError:
-         raise
-      except:
-         logging.exception("exception when executing module: " + str(args[0]) + " with arguments:" + str(args[1:]))
-
    def simulate(self, dt):
 
       self.thrust_acc = np.array([0.0, 0.0, 0.0])

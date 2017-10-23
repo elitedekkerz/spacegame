@@ -52,18 +52,20 @@ class client():
 
    def parse(self, args):
       try:
-         self.update(self.ship.parse(args))
+         status, message = self.ship.modules[args[0]].parse(args)
+         self.update(status, message)
+         #self.update(self.ship.parse(args))
       except KeyError:
          raise
       except:
-         logging.exception("unable to parse %s", repr(args))
+         logging.exception("exception when executing module: " + str(args[0]) + " with arguments:" + str(args[1:]))
 
    def __str__(self):
       return self.address[0]+":"+str(self.address[1])
    
-   def update(self, output=''):
+   def update(self, status, message):
       #send known changes to client
-      output +='\n'+self.player.name+'@'+self.ship.name+'>'
+      output ='\n{}\n{}\n{}@{}>'.format(status, message, self.player.name, self.ship.name)
       try:
          self.conn.send(output.encode('utf-8'))
       except socket.error as e:
@@ -101,7 +103,7 @@ class clientHandler():
          newShip = ship.ship()
          cli.joinShip(newShip)
          self.clientList.append(cli)
-         cli.update(motd)
+         cli.update('OK',motd)
   
    #remove a client from the list 
    def removeClient(self, cli):
@@ -132,7 +134,7 @@ class clientHandler():
          if args[1] == 'name':
             cli.player.name = str.join(' ',args[2:])
             logging.info('%s is now known as %s', cli, cli.player.name)
-            return 'your name is now '+cli.player.name
+            return 'Ok', 'your name is now '+cli.player.name
 
          #ship
          if args[1] == 'ship':
@@ -143,29 +145,29 @@ class clientHandler():
                #make sure ship isn't named and name is available
                for name, ship in self.ships.items():
                   if name == shipName:
-                     return 'sorry, that name is already taken'
+                     return 'Error', 'sorry, that name is already taken'
                   if ship == cli.ship:
-                     return 'your ship is already named '+name
+                     return 'Error', 'your ship is already named '+name
 
                #name ship and add it to the list of ships
                self.ships.update({shipName:cli.ship})
                cli.ship.name = shipName
                logging.info('%s named their ship %s', cli.player.name, cli.ship.name)
-               return 'you crudely engrave "' + shipName + '" on the side of your vessel'
+               return 'Ok', 'you crudely engrave "' + shipName + '" on the side of your vessel'
 
             #join ship
             if args[2] == 'join':
                try:
                   cli.joinShip(self.ships[shipName])
                   logging.info('%s, joined %s', cli.player.name, cli.ship.name)
-                  return 'you have joined the crew of '+shipName
+                  return 'Ok', 'you have joined the crew of '+shipName
                except:
-                  return 'that ship doesn\'t exist'
-            return 'unknown ship configuration command'
-         return 'unknown configuration command'
+                  return 'Error', 'that ship doesn\'t exist'
+            return 'Error', 'unknown ship configuration command'
+         return 'Error', 'unknown configuration command'
       except:
          logging.exception('can\'t handle client config request')
-         return 'invalid config command, read the documentation'
+         return 'Usage', 'invalid config command, read the documentation'
 
    #handle the clients in the list
    def handleClients(self):
@@ -193,21 +195,22 @@ class clientHandler():
                #configurations
                if args[0] == 'config':
                   try:
-                     cli.update(self.config(cli, args))
+                     status, message = self.config(cli, args)
+                     cli.update(status, message)
                   except:
                      logging.exception('unable configure client with %s', repr(args))
 
                #disconnect commands
                elif args[0] in ['quit', 'bye', 'exit']:
                   logging.info('Client %s gracefully quit.', str(cli))
-                  cli.update('bye!\n')
+                  cli.update('Ok', 'bye!\n')
                   self.removeClient(cli)
                   break
 
                #help
                else:
                   logging.info('%s doesn\'t know what to do', cli)
-                  cli.update(self.help(cli))
+                  cli.update('Usage', self.help(cli))
             except socket.error as e:
                if e.args[0] == errno.EWOULDBLOCK:
                   pass
