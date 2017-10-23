@@ -17,6 +17,12 @@ from gameObject import gameObject
 
 logging.basicConfig(level=logging.INFO)
 
+try:
+   with open('./motd.txt', 'r') as f:
+      motd = f.read(1024)
+except:
+      motd = 'http://github.com/eliteDekkerz/spacegame'
+
 class client():
    """
    handles data from and to client
@@ -87,6 +93,7 @@ class clientHandler():
          newShip = ship.ship()
          cli.joinShip(newShip)
          self.clientList.append(cli)
+         cli.update(motd)
   
    #remove a client from the list 
    def removeClient(self, cli):
