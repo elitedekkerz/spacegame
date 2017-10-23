@@ -30,16 +30,16 @@ class radar():
          return commands[args[1]](args)
       except:
          logging.exception('Radar exception')
-         return("Error. Usage: radar scan/sector/on/off/identify\n"
-                "output format:\n"
-                "identifier: <range>(meters) <elevation>(degrees) <azimuth>(degrees)\n")
+         return 'Usage', ("radar scan/sector/on/off/identify\n"
+               "output format:\n"
+               "identifier: <range>(meters) <elevation>(degrees) <azimuth>(degrees)\n")
 
    def simulate(self, dt, power_factor):
       self.power_factor = power_factor
 
    def scan(self, args):
       if not self.powered:
-         return "Radar is turned off"
+         return 'Error', "Radar is turned off"
 
       found_objects = []
 
@@ -58,25 +58,25 @@ class radar():
          dist, azimuth, inclination = self.ship.getSphericalCoordinateTo(i, inDeg = True)
          result += "{}: {:06.3E} {:+06.1f} {:+06.1f}\n".format(i.identifier, dist, azimuth, inclination)
 
-      return result
+      return 'Ok', result
 
    def setSector(self, args):
       try:
          self.sector = np.clip(float(args[2]), 1, 180)
-         return "sector set to: {0}".format(self.sector)
+         return 'Ok', "sector set to: {0}".format(self.sector)
       except IndexError:
-         return "{0}".format(self.sector)
+         return 'Ok', "{0}".format(self.sector)
       except:
-         logging.exception("exception when setting secotr value")
-         return "Error. Usage: radar sector {float = 1.0 ... 180.0}"
+         logging.exception("exception when setting sector value")
+         return "Error", "Expected {float = 1.0 ... 180.0}"
 
    def powerOn(self, args):
       self.powered = True
-      return " "
+      return 'Ok', " "
    
    def powerOff(self, args):
       self.powered = False
-      return " "
+      return 'Ok', " "
 
    def getPowerNeeded(self):
       if self.powered:
@@ -90,10 +90,11 @@ class radar():
 
    def identify(self, args):
       if not self.powered:
-         return "Radar is turned off"
+         return 'Error', "Radar is turned off"
 
       target = None
 
+      #find target from game objects
       for obj in gameObject.objects:
          if self.isInRange(obj) and obj.identifier == args[2]: 
             target = obj
@@ -105,6 +106,6 @@ class radar():
          result += "mass: {:06.3E}\n".format(target.mass)
          result += "heading: "+ str(target.getHeading())
       else:
-         return " "
+         return 'Error', "unknown target"
 
-      return result
+      return 'Ok', result
