@@ -44,6 +44,13 @@ class ship(gameObject):
          logging.exception("exception when executing module: " + str(args[0]) + " with arguments:" + str(args[1:]))
 
       logger.debug('received data %s', reply)
+
+      try:
+         if not isinstance(reply, str):
+            reply = reply[1]
+      except:
+         pass
+
       return reply
 
    def simulate(self, dt):

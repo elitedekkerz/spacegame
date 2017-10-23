@@ -1,3 +1,13 @@
+
+"""radio
+
+Usage:
+  radio on
+  radio off
+  radio get
+  radio set <volume>
+"""
+
 import logging
 
 logger = logging.getLogger('radio')
@@ -17,7 +27,7 @@ class radio():
          return commands[args[1]](args)
       except:
          logger.debug('incorrect command %s', str.join(' ', args))
-         return self.help()
+         return self.usage()
 
    def on(self,args):
       return self.set(['','','0.3'])
@@ -30,7 +40,8 @@ class radio():
       try:
          newVolume = float(args[2])
       except:
-         return self.help()
+         logger.info('who doesn\'t know how to work a radio?')
+         return "Error", "Radio 'set' function needs one argumet as float"
 
       #do some fancy calculations
       volumeDifference = newVolume - self.volume
@@ -44,7 +55,7 @@ class radio():
          reply = 'You try to adjust the radio, but nothing happens.'
 
       logger.info("volume set to %s", self.volume)
-      return reply
+      return "Ok", reply
 
    def get(self, args):
       logger.debug('volume info requested')
@@ -59,11 +70,10 @@ class radio():
          reply += 'possibly broken'
       else:
          reply += 'off'
-      return reply
+      return "Ok", reply
 
-   def help(self):
-      logger.info('who doesn\'t know how to work a radio?')
-      return "Error. Usage: radio <set/get/on/off> <value>"
+   def usage(self):
+      return "Usage", self.__doc__
 
    def simulate(self, dt, power_factor):
       pass
