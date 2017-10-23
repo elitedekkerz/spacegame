@@ -47,8 +47,9 @@ class client():
    def __str__(self):
       return self.address[0]+":"+str(self.address[1])
    
-   def update(self, output):
+   def update(self, output=''):
       #send known changes to client
+      output +='\n'+self.player.name+'@'+self.ship.name+'>'
       try:
          self.conn.send(output.encode('utf-8'))
       except socket.error as e:
@@ -169,13 +170,17 @@ class clientHandler():
 
                #ship commands
                if args[0] in cli.ship.modules:
-                  output = cli.ship.parse(args)
-                  break
+                  try:
+                     cli.update(cli.ship.parse(args))
+                  except:
+                     logging.exception('unable to parse %s', repr(args))
 
                #configurations
                elif args[0] == 'config':
-                  output = self.config(cli, args)
-                  break
+                  try:
+                     cli.update(self.config(cli, args))
+                  except:
+                     logging.exception('unable configure client with %s', repr(args))
 
                #disconnect commands
                elif args[0] in ['quit', 'bye', 'exit']:
@@ -187,12 +192,7 @@ class clientHandler():
                #help
                else:
                   logging.info('%s doesn\'t know what to do', cli)
-                  output = self.help(cli)
-
-               cli.conn.send(output.encode('utf-8'))
-
-               #send prompt to client
-               cli.update('\n'+cli.player.name+'@'+cli.ship.name+':')
+                  cli.update(self.help(cli))
             except socket.error as e:
                if e.args[0] == errno.EWOULDBLOCK:
                   pass
