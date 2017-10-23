@@ -49,7 +49,15 @@ class client():
       if len(self.ship.crew) < 1:
          self.ship.remove()
       self.ship = None
-   
+
+   def parse(self, args):
+      try:
+         self.update(self.ship.parse(args))
+      except KeyError:
+         raise
+      except:
+         logging.exception("unable to parse %s", repr(args))
+
    def __str__(self):
       return self.address[0]+":"+str(self.address[1])
    
@@ -176,14 +184,14 @@ class clientHandler():
                   continue
 
                #ship commands
-               if args[0] in cli.ship.modules:
-                  try:
-                     cli.update(cli.ship.parse(args))
-                  except:
-                     logging.exception('unable to parse %s', repr(args))
+               try:
+                  cli.parse(args)
+                  continue
+               except KeyError:
+                  pass
 
                #configurations
-               elif args[0] == 'config':
+               if args[0] == 'config':
                   try:
                      cli.update(self.config(cli, args))
                   except:
