@@ -29,7 +29,7 @@ class rudder():
       try:
          return commands[args[1]](args)
       except:
-         return "Error. Usage: rudder {yaw/roll/pitch} {float = -1.0 ... 1.0}"
+         return "Usage", "rudder {yaw/roll/pitch} {float = -1.0 ... 1.0}"
 
    def simulate(self, dt, power_factor):
 
@@ -52,44 +52,44 @@ class rudder():
    def yaw(self, args):
       try:
          self.axis_set[0] = np.clip(float(args[2]), -1, 1)
-         return "yaw set to: {0}".format(self.axis_set[0])
+         return "Ok", "yaw set to: {0}".format(self.axis_set[0])
       except:
          logging.exception("exception when setting yaw value")
-         return "Error. Usage: rudder yaw {float = -1.0 ... 1.0}"
+         return "Usage", "rudder yaw {float = -1.0 ... 1.0}"
 
    def roll(self, args):
       try:
          self.axis_set[1] = np.clip(float(args[2]), -1, 1)
-         return "roll set to: {0}".format(self.axis_set[1])
+         return "Ok", "roll set to: {0}".format(self.axis_set[1])
       except:
          logging.exception("exception when setting roll value")
-         return "Error. Usage: rudder roll {float = -1.0 ... 1.0}"
+         return "Usage", "rudder roll {float = -1.0 ... 1.0}"
    
    def pitch(self, args):
       try:
          self.axis_set[2] = np.clip(float(args[2]), -1, 1)
-         return "pitch set to: {0}".format(self.axis_set[2])
+         return "Ok", "pitch set to: {0}".format(self.axis_set[2])
       except:
          logging.exception("exception when setting pitch value")
-         return "Error. Usage: rudder pitch {float = -1.0 ... 1.0}"
+         return "Usage", "rudder pitch {float = -1.0 ... 1.0}"
 
    def get(self, args):
-      return "yaw: {0}, roll: {1}, pitch: {2}".format(self.axis_set[0], self.axis_set[1], self.axis_set[2])
+      return "Ok", "yaw: {0}, roll: {1}, pitch: {2}".format(self.axis_set[0], self.axis_set[1], self.axis_set[2])
 
    def heading(self, args):
       heading_vect = self.ship.heading.rotate([0.0, 0.0, 1.0])
-      return "heading {0}".format(heading_vect)
+      return "Ok", "heading {0}".format(heading_vect)
 
    def speed(self, args):
-      return "speed {0}".format(self.axis_speed)
+      return "Ok", "speed {0}".format(self.axis_speed)
 
    def setDampening(self, args):
       try:
          self.dampening_p = float(args[2])
-         return "dampening set to: {0}".format(self.dampening_p)
+         return "Ok", "dampening set to: {0}".format(self.dampening_p)
       except:
          logging.exception("exception when setting rudder value")
-         return "Error. Usage: rudder damp {float >= 0.0 }"
+         return "Usage", "rudder damp {float >= 0.0 }"
 
    def getPowerNeeded(self):
       return self.power_consumption * np.linalg.norm(self.axis_power * self.axis_set)

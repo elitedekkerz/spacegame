@@ -27,16 +27,16 @@ class generator():
          return self.help()
 
       logger.info("rector set to %s", self.reactor_level)
-      return " "
+      return "Ok", ""
 
    def get(self, args):
       logger.debug('rector info requested')
       reply = "Reactor is set to %.2f" % self.reactor_level
       reply += " and generates %.2f kW of power." %  (self.reactor_level * self.max_power_output / 1000)
-      return reply
+      return "Ok", reply
 
    def help(self):
-      return "Error. Usage: generator <set> <value>"
+      return "Usage", "generator <set> <value>"
 
    def simulate(self, dt, power_factor):
       pass

@@ -27,18 +27,18 @@ class log():
       else:
          self.data += inData
       logger.info('log updated: %s', inData[:-1])
-      return 'done.'
+      return "Ok", ""
 
    def read(self,args):
-      return self.data
+      return "Ok", self.data
 
    def clear(self,args):
       self.data = ''
       logger.info('log cleared')
-      return 'You cleared the log'
+      return "Ok", 'You cleared the log'
 
    def help(self):
-      return 'Error. usage: log <write <message>/read/clear>'
+      return 'Usage', "log <write <message>/read/clear>"
 
    def simulate(self, dt, power_factor):
       pass
