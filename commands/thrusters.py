@@ -21,7 +21,7 @@ class thrusters():
       try:
          return commands[args[1]](args)
       except:
-         return "Error. Usage: thruster set {float = 0.0 - 1.0}"
+         return "Usage", "thruster set {float = 0.0 - 1.0}"
 
    def simulate(self, dt, power_factor):
       self.ship.thrust_acc += self.thruster_power / self.ship.mass * self.set_value * power_factor
@@ -30,13 +30,13 @@ class thrusters():
       try:
          val = np.clip(float(args[2]), 0, 1)
          self.set_value = val
-         return "{0} thruster set to: {1}".format(args[2], val)
+         return "Ok", "{0} thruster set to: {1}".format(args[2], val)
       except:
          logging.exception("exception when setting thruster value")
-         return "Error. Usage: set thruster <name> {float = 0.0 - 1.0}"
+         return "Usage", "set thruster <name> {float = 0.0 - 1.0}"
 
    def get(self, args):
-      return str(self.set_value)
+      return "Ok", str(self.set_value)
 
    def getPowerNeeded(self):
       return self.set_value * self.power_consumption * np.linalg.norm(self.thruster_power)

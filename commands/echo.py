@@ -2,9 +2,9 @@
 class echo():
    def parse(self,args):
       try:
-         return str.join(' ', args[1:])
+         return "Ok", str.join(' ', args[1:])
       except:
-         return "Error. Usage: echo <message>"
+         return "Usage","echo <message>"
 
    def simulate(self, dt, power_factor):
       pass
