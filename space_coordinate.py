@@ -5,15 +5,15 @@ import numpy as np
 # It's basic class with operation overloading to convert data types
 
 class space_coordinate():
-
-   __position = np.array([0, 0, 0], dtype=np.int64)
-
    def getPosition(self):
       return self.__position / 1000.0
 
    def __init__(self, position = [0, 0, 0]):
-      tmp = np.array(position) * 1000
-      self.__position = tmp.astype(np.int64) 
+      if type(position) == space_coordinate:
+        self.__position = position
+      else:
+        tmp = np.array(position) * 1000
+        self.__position = tmp.astype(np.int64) 
 
    def __repr__(self):
       return repr(self.__position / 1000.0)
@@ -48,20 +48,6 @@ class space_coordinate():
       else:
          tmp.__position = (other.__position * 1000.0).astype(np.int64) - self.__position
       return tmp
-
-   def __iadd__(self, other):
-      if isinstance(other, space_coordinate):
-         self.__position = self.__position + other.__position
-      else:
-         self.__position = self.__position + (other.__position * 1000.0).astype(np.int64) 
-      return self
-
-   def __isub__(self, other):
-      if isinstance(other, space_coordinate):
-         self.__position = self.__position - other.__position
-      else:
-         self.__position = self.__position - (other.__position * 1000.0).astype(np.int64) 
-      return self
 
    def __abs__(self):
       return np.linalg.norm(self.__position) / 1000.0

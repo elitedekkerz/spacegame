@@ -10,17 +10,8 @@ import commands.thrusters
 logger = logging.getLogger('ship')
 
 class ship(gameObject):
-   ##Ships physical properties
-
-   name = 'Восток'
-
-   #Vector for telling  where ship is going
-   velocity = np.array([0.0, 0.0, 0.0])
-   thrust_acc = np.array([0.0, 0.0, 0.0])
-   
-   modules = {}
-
    def __init__(self, position = sc([0, 0, 0])):
+
       self.modules = {
          "radio": commands.radio(),
          "thrust_front": commands.thrusters(self, np.array([0.0, 0.0, -100000.0])),
@@ -34,18 +25,25 @@ class ship(gameObject):
          "crew": commands.crew(self),
          "generator": commands.generator(self, 25000000)
       }
+
+      self.name = 'Восток'
+
+      #Vector for telling  where ship is going
+      self.velocity = np.array([0.0, 0.0, 0.0])
+      self.thrust_acc = np.array([0.0, 0.0, 0.0])
+
       super().__init__("ship", position)
 
    def simulate(self, dt):
-
+         
       self.thrust_acc = np.array([0.0, 0.0, 0.0])
       power_factor = self.calc_power()
 
       for module in self.modules:
          self.modules[module].simulate(dt, power_factor)
 
-      acceleration = np.array([0.0, 0.0, 0.0])
-      acceleration += self.heading.rotate(self.thrust_acc)
+      #acceleration = np.array([0.0, 0.0, 0.0])
+      acceleration = self.heading.rotate(self.thrust_acc)
 
       self.velocity += acceleration * dt
       dpos = self.velocity * dt
