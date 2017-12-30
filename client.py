@@ -13,7 +13,7 @@ class client():
 
     def start(self):
         self.log.debug('starting')
-        self.run = True
+        self.alive = True
         self.threads =[]
         self.threads.append(threading.Thread(target=self.receiveMessages))
         self.threads.append(threading.Thread(target=self.sendMessages))
@@ -22,23 +22,25 @@ class client():
         self.log.info('client ready')
 
     def receiveMessages(self):
-        while self.run:
+        while self.alive:
             try:
                 data = self.socket.recv(1024)
+                if not data:
+                    raise Exception
                 self.log.info('%s> %s',repr(self.socket.getpeername()), data)
                 self.receivedMessages.put(data)
             except socket.timeout:
                 pass
             except:
                 logging.exception('unable to receive message from client')
-                self.run = False
+                self.alive = False
 
     def sendMessages(self):
-        while self.run:
+        while self.alive:
             try:
                 data = self.sentMessages.get(timeout=1)
-                if not data:
-                    continue
+                #if not data:
+                #    continue
                 self.log.info('%s< %s',repr(self.socket.getpeername()), data)
                 self.socket.send(data)
             except socket.timeout:
@@ -47,7 +49,7 @@ class client():
                 pass
             except:
                 logging.exception('unable to send message to client')
-                self.run = False
+                self.alive = False
 
     def getMessage(self):
         try:
@@ -60,7 +62,7 @@ class client():
 
     def stop(self):
         self.log.debug('stopping thread')
-        self.run = False
+        self.alive = False
         for thread in self.threads:
             thread.join()
         self.socket.close()
@@ -75,7 +77,7 @@ class clientHandler():
         self.socket.settimeout(1)
         self.clients=[]
 
-    def getClients(self):
+    def listClients(self):
         return self.clients
 
     def startAcceptingClients(self):
@@ -87,9 +89,14 @@ class clientHandler():
         self.run = False
         self.thread.join()
 
-    def kickAllClients(self):
+    def removeAllClients(self):
         for client in self.clients:
-            client.stop()
+            self.removeClient(client)
+
+    def removeClient(self, client):
+        self.log.info('removing client: %s', repr(client.socket.getpeername()))
+        client.stop()
+        self.clients.remove(client)
 
     def getClients(self):
         while self.run:
@@ -112,9 +119,14 @@ if __name__ == "__main__":
     a.startAcceptingClients()
     try:
         while True:
-            for client in a.getClients():
-                client.sendMessage(client.getMessage())
+            for cli in a.listClients():
+                if cli.alive:
+                    echo = cli.getMessage()
+                    if echo:
+                        cli.sendMessage(echo)
+                else:
+                    a.removeClient(cli)
     except:
-        pass
+        logging.exception('unable to echo to clients')
     a.stopAcceptingClients()
-    a.kickAllClients()
+    a.removeAllClients()
