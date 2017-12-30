@@ -90,6 +90,11 @@ class clientHandler():
         self.thread.join()
 
     def removeAllClients(self):
+        #kill all clients simultaniously in order to save time
+        for client in self.clients:
+            client.alive = False
+
+        #remove them properly
         for client in self.clients:
             self.removeClient(client)
 
