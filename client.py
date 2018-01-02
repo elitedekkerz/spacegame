@@ -39,7 +39,7 @@ class client():
                 pass
             except OSError:
                 #socket has been closed
-                self.run = False
+                self.alive = False
             except:
                 logging.exception('unable to receive message from client')
                 self.alive = False
