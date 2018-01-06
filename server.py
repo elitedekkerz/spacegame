@@ -1,23 +1,12 @@
-#!/usr/bin/python3
-"""
-run an echo server for multiple clients
-"""
-
-import socket
 import threading
 import logging
-import errno
 import time
-import numpy as np
-import timeit
 
 #game modules
 import client
 import ship
 import player
 import gameObject
-
-logging.basicConfig(level=logging.DEBUG)
 
 try:
     with open('./motd.txt', 'r') as f:
@@ -85,6 +74,8 @@ class server():
         for obj in gameObject.objects:
             try:
                 obj.simulate(dt)
+            except AttributeError:
+                continue
             except:
                 self.log.exception('unable to simulate %s', obj)
 
@@ -113,6 +104,7 @@ class server():
                 self.log.warning('method %s call taking too long to match tick rate (%s > %s)', method.__name__, simulationTime, 1/self.tickRate)
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.debug)
     s = server()
     s.start()
     while True:
