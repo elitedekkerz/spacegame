@@ -2,6 +2,8 @@ import numpy as np
 from pyquaternion import Quaternion
 import logging
 
+import player
+
 class rudder():
 
    def __init__(self, ship, axis_power):
@@ -29,7 +31,7 @@ class rudder():
       try:
          return commands[args[1]](args)
       except:
-         return "Usage", "rudder {yaw/roll/pitch} {float = -1.0 ... 1.0}"
+         return player.response.usage, "rudder {yaw/roll/pitch} {float = -1.0 ... 1.0}"
 
    def simulate(self, dt, power_factor):
 
@@ -52,44 +54,44 @@ class rudder():
    def yaw(self, args):
       try:
          self.axis_set[0] = np.clip(float(args[2]), -1, 1)
-         return "Ok", "yaw set to: {0}".format(self.axis_set[0])
+         return player.response.ok, "yaw set to: {0}".format(self.axis_set[0])
       except:
          logging.exception("exception when setting yaw value")
-         return "Usage", "rudder yaw {float = -1.0 ... 1.0}"
+         return player.response.usage, "rudder yaw {float = -1.0 ... 1.0}"
 
    def roll(self, args):
       try:
          self.axis_set[1] = np.clip(float(args[2]), -1, 1)
-         return "Ok", "roll set to: {0}".format(self.axis_set[1])
+         return player.response.ok, "roll set to: {0}".format(self.axis_set[1])
       except:
          logging.exception("exception when setting roll value")
-         return "Usage", "rudder roll {float = -1.0 ... 1.0}"
+         return player.response.usage, "rudder roll {float = -1.0 ... 1.0}"
    
    def pitch(self, args):
       try:
          self.axis_set[2] = np.clip(float(args[2]), -1, 1)
-         return "Ok", "pitch set to: {0}".format(self.axis_set[2])
+         return player.response.ok, "pitch set to: {0}".format(self.axis_set[2])
       except:
          logging.exception("exception when setting pitch value")
-         return "Usage", "rudder pitch {float = -1.0 ... 1.0}"
+         return player.response.usage, "rudder pitch {float = -1.0 ... 1.0}"
 
    def get(self, args):
-      return "Ok", "yaw: {0}, roll: {1}, pitch: {2}".format(self.axis_set[0], self.axis_set[1], self.axis_set[2])
+      return player.response.ok, "yaw: {0}, roll: {1}, pitch: {2}".format(self.axis_set[0], self.axis_set[1], self.axis_set[2])
 
    def heading(self, args):
       heading_vect = self.ship.heading.rotate([0.0, 0.0, 1.0])
-      return "Ok", "heading {0}".format(heading_vect)
+      return player.response.ok, "heading {0}".format(heading_vect)
 
    def speed(self, args):
-      return "Ok", "speed {0}".format(self.axis_speed)
+      return player.response.ok, "speed {0}".format(self.axis_speed)
 
    def setDampening(self, args):
       try:
          self.dampening_p = float(args[2])
-         return "Ok", "dampening set to: {0}".format(self.dampening_p)
+         return player.response.ok, "dampening set to: {0}".format(self.dampening_p)
       except:
          logging.exception("exception when setting rudder value")
-         return "Usage", "rudder damp {float >= 0.0 }"
+         return player.response.usage, "rudder damp {float >= 0.0 }"
 
    def getPowerNeeded(self):
       return self.power_consumption * np.linalg.norm(self.axis_power * self.axis_set)

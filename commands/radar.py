@@ -2,6 +2,7 @@ import math
 import numpy as np
 
 #import server
+import player
 import gameObject
 import logging
 
@@ -34,7 +35,7 @@ class radar():
          return commands[args[1]](args)
       except:
          logging.exception('Radar exception')
-         return 'Usage', ("radar scan/sector/on/off/identify\n"
+         return player.response.usage, ("radar scan/sector/on/off/identify\n"
                "output format:\n"
                "identifier: <range>(meters) <elevation>(degrees) <azimuth>(degrees)\n")
 
@@ -65,7 +66,7 @@ class radar():
 
    def scan(self, args):
       if not self.powered:
-         return 'Error', "Radar is turned off"
+         return player.response.error, "Radar is turned off"
       
       #Generate string from the scaned objects
       result = ""
@@ -73,26 +74,26 @@ class radar():
          dist, azimuth, inclination = self.ship.getSphericalCoordinateTo(i, inDeg = True)
          result += "{}: {:06.3E} {:+06.1f} {:+06.1f}\n".format(i.identifier, dist, azimuth, inclination)
 
-      return 'Ok', result
+      return player.response.ok, result
 
    def setSector(self, args):
       try:
          self.sector = np.clip(float(args[2]), 1, 180)
-         return 'Ok', "sector set to: {0}".format(self.sector)
+         return player.response.ok, "sector set to: {0}".format(self.sector)
       except IndexError:
-         return 'Ok', "{0}".format(self.sector)
+         return player.response.ok, "{0}".format(self.sector)
       except:
          logging.exception("exception when setting sector value")
-         return "Error", "Expected {float = 1.0 ... 180.0}"
+         return player.response.ok, "Expected {float = 1.0 ... 180.0}"
 
    def powerOn(self, args):
       self.powered = True
       self.next_scan = 0
-      return 'Ok', " "
+      return player.response.ok, " "
    
    def powerOff(self, args):
       self.powered = False
-      return 'Ok', " "
+      return player.response.ok, " "
 
    def getPowerNeeded(self):
       if self.powered:
@@ -105,7 +106,7 @@ class radar():
 
    def identify(self, args):
       if not self.powered:
-         return 'Error', "Radar is turned off"
+         return player.response.error, "Radar is turned off"
 
       target = None
       eff_range = self.range * (180 / self.sector) * self.power_factor
@@ -122,6 +123,6 @@ class radar():
          result += "mass: {:06.3E}\n".format(target.mass)
          result += "heading: "+ str(target.getHeading())
       else:
-         return 'Error', "unknown target"
+         return player.response.error, "unknown target"
 
-      return 'Ok', result
+      return player.response.ok, result
