@@ -33,7 +33,7 @@ class client():
                 data = self.socket.recv(1024)
                 if not data:
                     raise Exception
-                self.log.info('%s> %s',repr(self.socket.getpeername()), data)
+                self.log.info('> %s', data)
                 self.receivedMessages.put(data)
             except socket.timeout:
                 pass
@@ -41,7 +41,7 @@ class client():
                 #socket has been closed
                 self.alive = False
             except:
-                logging.exception('unable to receive message from client')
+                self.log.exception('unable to receive message from client')
                 self.alive = False
 
     def sendMessages(self):
@@ -49,14 +49,14 @@ class client():
         while self.alive:
             try:
                 data = self.sentMessages.get(timeout=1)
-                self.log.info('%s< %s',repr(self.socket.getpeername()), data)
+                self.log.info('< %s', data)
                 self.socket.send(data)
             except socket.timeout:
                 pass
             except queue.Empty:
                 pass
             except:
-                logging.exception('unable to send message to client')
+                self.log.exception('unable to send message to client')
                 self.alive = False
         self.log.debug('send thread finished')
 

@@ -3,13 +3,14 @@ import logging
 
 class player():
     '''process data received from client'''
-    def __init__(self, client)
+    def __init__(self, client):
         #functionality variables
         self.client = client
         self.log = logging.getLogger(self.client.addressString)
         #game variables
         self.name = 'Yuri'
         self.ship = None
+        #self.prompt = '\n{}@{}>'.format(self.name,self.ship.name)
         self.log.info('ready')
 
     def disconnect(self):

@@ -9,251 +9,116 @@ import logging
 import errno
 import time
 import numpy as np
+import timeit
 
 #game modules
+import client
 import ship
 import player
-from gameObject import gameObject
+import gameObject
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 try:
-   with open('./motd.txt', 'r') as f:
-      motd = f.read(1024)
+    with open('./motd.txt', 'r') as f:
+        motd = f.read(1024)
 except:
-      motd = 'http://github.com/eliteDekkerz/spacegame'
+        motd = 'http://github.com/eliteDekkerz/spacegame'
 
-class client():
-   """
-   handles data from and to client
-   """
-   def __init__(self, conn, address):
-      self.conn = conn
-      self.address = address
-      self.changes = ''
-      self.player = player.player()
-      self.ship = None
+#provide basic help
+def help(self, client):
+  commands =''
+  for key in client.ship.modules:
+      commands += key+"\n"
+  return ("\n"
+      "\\\\\\spacegame///\n"
+      "version ?.?.?\n"
+      "list of commands:\n\n"
+      + commands +
+      "\nfor more info, visit:\n"
+      "https://github.com/elitedekkerz/spacegame\n"
+  )
 
-   #move client to ship
-   def joinShip(self, ship):
-      try:
-         self.leaveShip()
-      except:
-         pass
-      self.ship = ship
-      self.ship.crew.append(self.player)
+class server():
+    def __init__(self):
+        self.log = logging.getLogger('server')
+        self.clientHandler = client.clientHandler('0.0.0.0',1961)
+        self.clientHandler.startAcceptingClients()
+        self.tickRate = 100 #how often do we update everything?
+        self.run = True
 
-   def leaveShip(self):
-      self.ship.crew.remove(self.player)
-      #remove old ship if left empty
-      if len(self.ship.crew) < 1:
-         self.ship.remove()
-      self.ship = None
+        #setup threads
+        self.threads = []
+        self.threads.append(threading.Thread(target = self.tickLoop, args = (self.simulate,)))
+        self.threads.append(threading.Thread(target = self.tickLoop, args = (self.processClients,)))
 
-   def parse(self, args):
-      try:
-         status, message = self.ship.modules[args[0]].parse(args)
-         self.update(status, message)
-         #self.update(self.ship.parse(args))
-      except KeyError:
-         raise
-      except:
-         logging.exception("exception when executing module: " + str(args[0]) + " with arguments:" + str(args[1:]))
+    def start(self):
+        for th in self.threads:
+            th.start()
 
-   def __str__(self):
-      return self.address[0]+":"+str(self.address[1])
-   
-   def update(self, status, message):
-      #send known changes to client
-      output ='\n{}\n{}\n{}@{}>'.format(status, message, self.player.name, self.ship.name)
-      try:
-         self.conn.send(output.encode('utf-8'))
-      except socket.error as e:
-         if e.args[0] == errno.EWOULDBLOCK:
-            pass
-      except:
-         raise
+    def stop(self):
+        #get rid of clients
+        self.clientHandler.stopAcceptingClients()
+        self.clientHandler.removeAllClients()
 
-class clientHandler():
-   #a list for all the connected clients
-   clientList = []
-   ships = {}
-   clientListLock = threading.Lock()
-   run = False
+        #stop game
+        self.log.debug('stopping threads')
+        self.run = False
+        for th in self.threads:
+            th.join()
 
-   #provide basic help
-   def help(self, client):
-      commands =''
-      for key in client.ship.modules:
-         commands += key+"\n"
-      return ("\n"
-         "\\\\\\spacegame///\n"
-         "version ?.?.?\n"
-         "list of commands:\n\n"
-         + commands +
-         "\nfor more info, visit:\n"
-         "https://github.com/elitedekkerz/spacegame\n"
-      )
+        self.log.info('bye!')
 
-   #add a client to the list
-   def addClient(self, cli):
-      with self.clientListLock:
-         logging.info('client %s connected',str(cli))
-         cli.conn.setblocking(0)
-         newShip = ship.ship()
-         cli.joinShip(newShip)
-         self.clientList.append(cli)
-         cli.update('OK',motd)
-  
-   #remove a client from the list 
-   def removeClient(self, cli):
-      with self.clientListLock:
-         cli.leaveShip()
-         cli.conn.close()
-         self.clientList.remove(cli)
-         logging.info('client %s removed', str(cli))
+    def processClients(self,dt):
+        #process a single message from each client
+        for cli in self.clientHandler.listClients():
+            if cli.alive:
+                echo = cli.getMessage()
+                if echo:
+                    cli.sendMessage(echo)
+            else:
+                #remove client if not responding
+                self.log.debug('%s not responding', cli)
+                self.clientHandler.removeClient(cli)
+    
+    def simulate(self,dt):
+        #process each game object once
+        for obj in gameObject.objects:
+            try:
+                obj.simulate(dt)
+            except:
+                self.log.exception('unable to simulate %s', obj)
 
-   #start thread for client handling
-   def start(self):
-      self.run = True
-      #Create asteroids in 100 km radius 
-      for i in range(100):
-         pos = (np.random.rand(3) - 0.5) * 100000
-         newAsteroid = gameObject("ast", pos)
+    def tickLoop(self, method):
+        #init timeke eping
+        prev_time =  time.perf_counter()
+        #try to call given metod at server tick rate
+        while self.run:
+            #get accurate representation of last time called
+            now = time.perf_counter()
+            dt = now - prev_time
+            prev_time = now
 
-      threading.Thread(target=clients.handleClients,args=()).start()
+            #call given method
+            try:
+                method(dt)
+            except:
+                self.log.exception('unable to call method: %s', method.__name__)
 
-   #stop client handling thread
-   def stop(self):
-      self.run = False
+            #check if simulation is taking for too long
+            simulationTime = (time.perf_counter() - now)
+            try:
+                #todo: get more accurate timing
+                time.sleep(1/self.tickRate - simulationTime)
+            except ValueError:
+                self.log.warning('method %s call taking too long to match tick rate (%s > %s)', method.__name__, simulationTime, 1/self.tickRate)
 
-   def config(self, cli, args):
-      logging.debug('%s is configurig with args: %s', cli, str(args))
-      try:
-         #set player name
-         if args[1] == 'name':
-            cli.player.name = str.join(' ',args[2:])
-            logging.info('%s is now known as %s', cli, cli.player.name)
-            return 'Ok', 'your name is now '+cli.player.name
-
-         #ship
-         if args[1] == 'ship':
-            shipName = str.join(' ', args[3:])
-
-            #set ship name
-            if args[2] == 'name':
-               #make sure ship isn't named and name is available
-               for name, ship in self.ships.items():
-                  if name == shipName:
-                     return 'Error', 'sorry, that name is already taken'
-                  if ship == cli.ship:
-                     return 'Error', 'your ship is already named '+name
-
-               #name ship and add it to the list of ships
-               self.ships.update({shipName:cli.ship})
-               cli.ship.name = shipName
-               logging.info('%s named their ship %s', cli.player.name, cli.ship.name)
-               return 'Ok', 'you crudely engrave "' + shipName + '" on the side of your vessel'
-
-            #join ship
-            if args[2] == 'join':
-               try:
-                  cli.joinShip(self.ships[shipName])
-                  logging.info('%s, joined %s', cli.player.name, cli.ship.name)
-                  return 'Ok', 'you have joined the crew of '+shipName
-               except:
-                  return 'Error', 'that ship doesn\'t exist'
-            return 'Error', 'unknown ship configuration command'
-         return 'Error', 'unknown configuration command'
-      except:
-         logging.exception('can\'t handle client config request')
-         return 'Usage', 'invalid config command, read the documentation'
-
-   #handle the clients in the list
-   def handleClients(self):
-
-      #Get start timr for the simulation
-      prev_time = time.perf_counter()
-      while self.run:
-         for cli in self.clientList:
-            #get input from client
-            try: 
-               data = cli.conn.recv(1024).decode('utf-8', 'ignore')
-
-               #parse received data via an external class for some reason
-               args = cli.player.readInput(data)
-               if not args:
-                  continue
-
-               #ship commands
-               try:
-                  cli.parse(args)
-                  continue
-               except KeyError:
-                  pass
-
-               #configurations
-               if args[0] == 'config':
-                  try:
-                     status, message = self.config(cli, args)
-                     cli.update(status, message)
-                  except:
-                     logging.exception('unable configure client with %s', repr(args))
-
-               #disconnect commands
-               elif args[0] in ['quit', 'bye', 'exit']:
-                  logging.info('Client %s gracefully quit.', str(cli))
-                  cli.update('Ok', 'bye!\n')
-                  self.removeClient(cli)
-                  break
-
-               #help
-               else:
-                  logging.info('%s doesn\'t know what to do', cli)
-                  cli.update('Usage', self.help(cli))
-            except socket.error as e:
-               if e.args[0] == errno.EWOULDBLOCK:
-                  pass
-            except AttributeError:
-                    logging.info('Client %s has unexpectedly quit.', str(cli))
-                    self.removeClient(cli)
-
-         #See if we need to run the simulation
-         dt = time.perf_counter() - prev_time
-         if dt > 0.05:
-            prev_time = time.perf_counter()
-            #Run the simulation
-            for cli in self.clientList:
-               cli.ship.simulate(dt)
-         else:
-            time.sleep(0.05-dt)
-
-#setup server socket for connecting
-logging.info('opening socket')
-sock=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
-sock.bind(('0.0.0.0',1961))
-sock.listen(5)
-
-#setup handler for clients
-logging.info('setting up client handler')
-clients = clientHandler()
-clients.start()
-
-#main loop
-logging.info('accepting connections')
-while True:
-   try:
-      conn, address = sock.accept()
-      cli = client(conn, address)
-      clients.addClient(cli)
-   except KeyboardInterrupt:
-      break
-   except:
-      logging.exception('')
-
-#clean up
-logging.info('shutting down')
-clients.stop()
-sock.close()
-logging.info('bye!')
+if __name__ == '__main__':
+    s = server()
+    s.start()
+    while True:
+        try:
+            time.sleep(1)
+        except KeyboardInterrupt:
+            break
+    s.stop()
