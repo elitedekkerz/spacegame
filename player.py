@@ -1,27 +1,50 @@
 from types import *
 import logging
 
+players = []
+playerIDCounter = 0
+
 class player():
     '''process data received from client'''
     def __init__(self, client):
         #functionality variables
         self.client = client
-        self.log = logging.getLogger(self.client.addressString)
         #game variables
         self.name = 'Yuri'
         self.ship = None
-        #self.prompt = '\n{}@{}>'.format(self.name,self.ship.name)
+
+        #add player to game
+        global players, playerIDCounter
+        self.id = playerIDCounter
+        playerIDCounter += 1
+        players.append(self)
+        self.log = logging.getLogger('player-'+str(self.id))
+
+        #send client some confirmation that they have connected
+        self.updatePrompt()
+        self.client.sendMessage(self.prompt.encode('utf-8'))
         self.log.info('ready')
 
     def disconnect(self):
         '''remove self from ship and kill client'''
         self.leaveShip()
-        self.alive = False
+        self.client.alive = False
+        global players
+        players.remove(self)
         self.log.info('disconnected')
+
+    def updatePrompt(self):
+        '''rebuild prompt string'''
+        self.prompt = '\n'
+        self.prompt += self.name
+        if self.ship:
+            self.prompt += self.ship.name
+        self.prompt += '>'
 
     def setName(self, name):
         '''change onscreen name'''
         self.name = name
+        self.updatePrompt()
         self.log.info('changed name to %s', self.name)
 
     def joinShip(self, ship):
@@ -39,6 +62,7 @@ class player():
 
     def echo(self, message):
         '''return what was given'''
+        self.log.info('echoing: %s', message)
         return message
 
     def parse(self):
@@ -46,5 +70,6 @@ class player():
         #echo as placeholder
         message = self.client.getMessage()
         if message:
+            response = 'OK\n'
             reply = self.echo(message)
-            self.client.sendMessage(reply)
+            self.client.sendMessage('{}{}{}'.format(response,reply ,self.prompt).encode('utf-8'))

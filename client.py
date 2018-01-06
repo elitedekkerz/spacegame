@@ -33,7 +33,7 @@ class client():
                 data = self.socket.recv(1024)
                 if not data:
                     raise Exception
-                self.log.info('> %s', data)
+                self.log.debug('> %s', data)
                 self.receivedMessages.put(data)
             except socket.timeout:
                 pass
@@ -49,7 +49,7 @@ class client():
         while self.alive:
             try:
                 data = self.sentMessages.get(timeout=1)
-                self.log.info('< %s', data)
+                self.log.debug('< %s', data)
                 self.socket.send(data)
             except socket.timeout:
                 pass
@@ -123,6 +123,10 @@ class clientHandler():
         self.log.debug('socket closed')
         self.log.info('no longer accepting clients')
 
+    def attachNewClientEvent(self, method):
+        '''set given method to be called when new client joins'''
+        self.newClientMethod = method
+
     def removeAllClients(self):
         '''drop all clients'''
         #kill all clients simultaniously in order to save time
@@ -131,7 +135,7 @@ class clientHandler():
 
         #remove them properly
         count = 0
-        for client in self.clients:
+        for cli in self.clients:
             self.removeClient(cli)
             count += 1
         self.log.debug('%s clients kicked', str(count))
@@ -151,6 +155,12 @@ class clientHandler():
                 cli = client(connection)
                 cli.start()
                 self.clients.append(cli)
+                #try to raise new client event
+                try:
+                    self.newClientMethod(cli)
+                    self.log.debug('new client method (%s) called',self.newClientMethod.__name__)
+                except:
+                    self.log.exception('')
             except socket.timeout:
                 pass
             except:

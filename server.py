@@ -44,6 +44,8 @@ class server():
         self.log = logging.getLogger('server')
         self.clientHandler = client.clientHandler('0.0.0.0',1961)
         self.clientHandler.startAcceptingClients()
+        #set client handler to create new player when client joins
+        self.clientHandler.attachNewClientEvent(player.player)
         self.tickRate = 100 #how often do we update everything?
         self.run = True
 
@@ -57,29 +59,26 @@ class server():
             th.start()
 
     def stop(self):
-        #get rid of clients
-        self.clientHandler.stopAcceptingClients()
-        self.clientHandler.removeAllClients()
-
         #stop game
         self.log.debug('stopping threads')
         self.run = False
         for th in self.threads:
             th.join()
 
+        #get rid of clients
+        self.clientHandler.stopAcceptingClients()
+        self.clientHandler.removeAllClients()
         self.log.info('bye!')
 
     def processClients(self,dt):
         #process a single message from each client
-        for cli in self.clientHandler.listClients():
-            if cli.alive:
-                echo = cli.getMessage()
-                if echo:
-                    cli.sendMessage(echo)
+        for pl in player.players:
+            #make sure client is still connected
+            if pl.client.alive:
+                pl.parse()
             else:
-                #remove client if not responding
-                self.log.debug('%s not responding', cli)
-                self.clientHandler.removeClient(cli)
+                pl.disconnect()
+                self.clientHandler.removeClient(pl.client)
     
     def simulate(self,dt):
         #process each game object once
