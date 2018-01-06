@@ -77,8 +77,9 @@ class client():
         '''stop threads for sending/receiving messages via socket'''
         self.log.debug('stopping thread')
         self.alive = False
-        for thread in self.threads:
-            thread.join()
+        #TODO: waiting for the threads to stop causes the game to stutter
+        #for thread in self.threads:
+        #    thread.join()
         self.log.debug('closing socket')
         self.socket.close()
         self.log.info('disconnected')
