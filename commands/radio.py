@@ -9,6 +9,7 @@ Usage:
 """
 
 import logging
+import player
 
 logger = logging.getLogger('radio')
 
@@ -41,7 +42,7 @@ class radio():
          newVolume = float(args[2])
       except:
          logger.info('who doesn\'t know how to work a radio?')
-         return "Error", "Radio 'set' function needs one argumet as float"
+         return player.response.ok, "Radio 'set' function needs one argumet as float"
 
       #do some fancy calculations
       volumeDifference = newVolume - self.volume
@@ -55,7 +56,7 @@ class radio():
          reply = 'You try to adjust the radio, but nothing happens.'
 
       logger.info("volume set to %s", self.volume)
-      return "Ok", reply
+      return player.response.ok, reply
 
    def get(self, args):
       logger.debug('volume info requested')
@@ -70,10 +71,10 @@ class radio():
          reply += 'possibly broken'
       else:
          reply += 'off'
-      return "Ok", reply
+      return player.response.ok, reply
 
    def usage(self):
-      return "Usage", self.__doc__
+      return player.response.usage, self.__doc__
 
    def simulate(self, dt, power_factor):
       pass

@@ -3,6 +3,7 @@
 import numpy as np
 import logging
 from space_coordinate import space_coordinate as sc
+import player
 
 logger = logging.getLogger("ship info")
 
@@ -22,20 +23,20 @@ class ship_info():
          return commands[args[1]](args)
       except:
          logging.exception("exception when running command")
-         return "Usage", "ship position/velocity/heading/power"
+         return player.response.usage, "ship position/velocity/heading/power"
 
    def simulate(self, dt, power_factor):
       pass
 
    def getPosition(self, args):
-      return "Ok", str(self.ship.position)
+      return player.response.ok, str(self.ship.position)
 
    def getVelocity(self, args):
-      return "Ok",  str(self.ship.velocity)
+      return player.response.ok,  str(self.ship.velocity)
       
    def getHeading(self, args):
       try:
-        return "Ok", str(self.ship.heading.rotate(np.array([0.0, 0.0, 1.0])))
+        return player.response.ok, str(self.ship.heading.rotate(np.array([0.0, 0.0, 1.0])))
       except:
         logger.exception("Heading")
 

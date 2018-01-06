@@ -1,4 +1,5 @@
 import logging
+import player
 import numpy as np
 
 logger = logging.getLogger('generator')
@@ -27,16 +28,16 @@ class generator():
          return self.help()
 
       logger.info("rector set to %s", self.reactor_level)
-      return "Ok", ""
+      return player.response.ok, ''
 
    def get(self, args):
       logger.debug('rector info requested')
       reply = "Reactor is set to %.2f" % self.reactor_level
       reply += " and generates %.2f kW of power." %  (self.reactor_level * self.max_power_output / 1000)
-      return "Ok", reply
+      return player.response.ok, reply
 
    def help(self):
-      return "Usage", "generator <set> <value>"
+      return player.response.usage, "generator <set> <value>"
 
    def simulate(self, dt, power_factor):
       pass

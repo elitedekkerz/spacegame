@@ -1,4 +1,5 @@
 import logging
+import player
 logger = logging.getLogger('crew')
 
 class crew():
@@ -15,11 +16,11 @@ class crew():
             reply = ''
             for member in self.ship.crew:
                reply += member.name+'\n'
-            return "Ok", reply
+            return player.response.ok, reply
          return self.help()
       except:
          logger.exception('unable to parse')
          return self.help()
 
    def help(self):
-      return "Usage",  "crew list"
+      return player.response.usage,  "crew list"
