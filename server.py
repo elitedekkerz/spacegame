@@ -8,26 +8,6 @@ import ship
 import player
 import gameObject
 
-try:
-    with open('./motd.txt', 'r') as f:
-        motd = f.read(1024)
-except:
-        motd = 'http://github.com/eliteDekkerz/spacegame'
-
-#provide basic help
-def help(self, client):
-  commands =''
-  for key in client.ship.modules:
-      commands += key+"\n"
-  return ("\n"
-      "\\\\\\spacegame///\n"
-      "version ?.?.?\n"
-      "list of commands:\n\n"
-      + commands +
-      "\nfor more info, visit:\n"
-      "https://github.com/elitedekkerz/spacegame\n"
-  )
-
 class server():
     def __init__(self):
         self.log = logging.getLogger('server')
