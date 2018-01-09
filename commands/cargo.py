@@ -34,7 +34,7 @@ class cargo():
       except:
          return self.help()
       
-      return "Ok", output
+      return player.response.ok, output
 
    def give(self, args):
       item_name = args[2]
@@ -44,16 +44,16 @@ class cargo():
          item = items.item(item_name, amount)
       except:
          logger.info("Player requested item that doesn't exist: {}".format(item_name))
-         return "Ok", "There is no such thing as \"{}\" in the universe".format(item_name)
+         return player.response.ok, "There is no such thing as \"{}\" in the universe".format(item_name)
       self.inventory.insert(item)
       reply = "{} {} added to your inventory, you dirty little cheater.".format(amount, item_name)
-      return "Ok", reply
+      return player.response.ok, reply
 
    def dump(self, args):
       item_name = args[2]
       slots = self.inventory.find(item_name)
       if len(slots) == 0:
-         return "Ok", "You don't have any \"{}\".".format(item_name)
+         return player.response.ok, "You don't have any \"{}\".".format(item_name)
       
       amount_dumped = 0
 
@@ -68,19 +68,19 @@ class cargo():
             amount_dumped += item.count
 
       reply = "You shoved {} {} out of airlock.".format(amount_dumped, item_name)
-      return "Ok", reply
+      return player.response.ok, reply
 
    def get_mass(self, args):
       mass = self.inventory.get_mass()
       reply = "Total mass of the invetory is {} kg.".format(mass)
-      return "Ok", reply      
+      return player.response.ok, reply
 
    def help(self):
       usage = "cargo list\n"
       usage += "cargo mass\n"
       usage += "cargo give <item> <amount>\n"
       usage += "cargo dump <item> <amount>\n"
-      return "Usage", usage
+      return player.response.usage, usage
 
    def simulate(self, dt, power_factor):
       pass
