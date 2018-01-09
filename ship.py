@@ -23,7 +23,8 @@ class ship(gameObject):
          "time": commands.timer(),
          "radar": commands.radar(self),
          "crew": commands.crew(self),
-         "generator": commands.generator(self, 25000000)
+         "generator": commands.generator(self, 25000000),
+         "cargo" : commands.cargo(),
       }
 
       self.name = 'Восток'
