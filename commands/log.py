@@ -1,4 +1,5 @@
 import logging
+import player
 logger = logging.getLogger('log')
 
 class log():
@@ -27,18 +28,18 @@ class log():
       else:
          self.data += inData
       logger.info('log updated: %s', inData[:-1])
-      return "Ok", ""
+      return player.response.ok, ''
 
    def read(self,args):
-      return "Ok", self.data
+      return player.response.ok, self.data
 
    def clear(self,args):
       self.data = ''
       logger.info('log cleared')
-      return "Ok", 'You cleared the log'
+      return player.response.ok, 'log cleared'
 
    def help(self):
-      return 'Usage', "log <write <message>/read/clear>"
+      return player.response.usage, "log <write <message>/read/clear>"
 
    def simulate(self, dt, power_factor):
       pass

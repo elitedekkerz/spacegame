@@ -17,7 +17,6 @@ class ship(gameObject):
          "thrust_front": commands.thrusters(self, np.array([0.0, 0.0, -100000.0])),
          "thrust_back": commands.thrusters(self, np.array([0.0, 0.0, 500000.0])),
          "rudder": commands.rudder(self, np.array([100000.0, 100000.0, 100000.0])),
-         "echo": commands.echo(),
          "ship": commands.ship_info(self),
          "log": commands.log(),
          "time": commands.timer(),

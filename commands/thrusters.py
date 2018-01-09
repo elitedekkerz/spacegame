@@ -1,6 +1,7 @@
 import numpy as np
 from pyquaternion import Quaternion
 import logging
+import player
 
 class thrusters():
 
@@ -21,7 +22,7 @@ class thrusters():
       try:
          return commands[args[1]](args)
       except:
-         return "Usage", "thruster set {float = 0.0 - 1.0}"
+         return player.response.usage, "thruster set {float = 0.0 - 1.0}"
 
    def simulate(self, dt, power_factor):
       self.ship.thrust_acc += self.thruster_power / self.ship.mass * self.set_value * power_factor
@@ -30,13 +31,13 @@ class thrusters():
       try:
          val = np.clip(float(args[2]), 0, 1)
          self.set_value = val
-         return "Ok", "{0} thruster set to: {1}".format(args[2], val)
+         return player.response.ok, "{0} thruster set to: {1}".format(args[2], val)
       except:
          logging.exception("exception when setting thruster value")
-         return "Usage", "set thruster <name> {float = 0.0 - 1.0}"
+         return player.response.usage, "set thruster <name> {float = 0.0 - 1.0}"
 
    def get(self, args):
-      return "Ok", str(self.set_value)
+      return player.response.ok, str(self.set_value)
 
    def getPowerNeeded(self):
       return self.set_value * self.power_consumption * np.linalg.norm(self.thruster_power)
