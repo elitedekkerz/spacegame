@@ -1,6 +1,7 @@
 import logging
 import numpy as np
 import items
+import player
 
 logger = logging.getLogger('cargo')
 
