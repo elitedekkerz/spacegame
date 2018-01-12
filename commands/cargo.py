@@ -85,6 +85,3 @@ class cargo():
 
    def simulate(self, dt, power_factor):
       pass
-   
-   def getPowerGenerated(self):
-      return self.reactor_level * self.max_power_output
