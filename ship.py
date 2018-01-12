@@ -24,6 +24,7 @@ class ship(gameObject):
          "crew": commands.crew(self),
          "generator": commands.generator(self, 25000000),
          "cargo" : commands.cargo(),
+         "laser": commands.laser(self),
       }
 
       self.name = 'Восток'

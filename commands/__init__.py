@@ -8,3 +8,4 @@ from .radar import radar
 from .crew import crew
 from .generator import generator
 from .cargo import cargo
+from .laser import laser
