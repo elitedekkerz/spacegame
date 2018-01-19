@@ -1,9 +1,10 @@
-#!/usr/bin/python3
+#!/usr/bin/python3 -i
 import server
 import gameObject
 import logging
 import numpy as np
 import time
+import atexit
 
 logging.basicConfig(level=logging.INFO)
 s = server.server()
@@ -13,9 +14,8 @@ s.start()
 for i in range(100):
     pos = (np.random.rand(3) - 0.5) * 100000
     newAsteroid = gameObject.gameObject("ast", pos)
-while True:
-    try:
-        time.sleep(1)
-    except KeyboardInterrupt:
-        break
-s.stop()
+
+#stop server before quitting
+atexit.register(s.stop)
+
+print('ready!')

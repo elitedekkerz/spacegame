@@ -20,8 +20,8 @@ class client():
         self.log.debug('starting')
         self.alive = True
         self.threads =[]
-        self.threads.append(threading.Thread(target=self.receiveMessages))
-        self.threads.append(threading.Thread(target=self.sendMessages))
+        self.threads.append(threading.Thread(target=self.receiveMessages, daemon=True))
+        self.threads.append(threading.Thread(target=self.sendMessages, daemon=True))
         for thread in self.threads:
             thread.start()
         self.log.debug('ready')
@@ -109,7 +109,7 @@ class clientHandler():
     def startAcceptingClients(self):
         '''start thread which accepts clients'''
         self.run = True
-        self.thread = threading.Thread(target=self.getClients)
+        self.thread = threading.Thread(target=self.getClients, daemon=True)
         self.thread.start()
         self.log.debug('thread started')
 

@@ -20,8 +20,8 @@ class server():
 
         #setup threads
         self.threads = []
-        self.threads.append(threading.Thread(target = self.tickLoop, args = (self.simulate,)))
-        self.threads.append(threading.Thread(target = self.tickLoop, args = (self.processClients,)))
+        self.threads.append(threading.Thread(target = self.tickLoop, args = (self.simulate,), daemon=True))
+        self.threads.append(threading.Thread(target = self.tickLoop, args = (self.processClients,), daemon=True))
 
     def start(self):
         for th in self.threads:
