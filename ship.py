@@ -6,12 +6,13 @@ from gameObject import gameObject
 #game modules
 import commands.radio
 import commands.thrusters
+import items
 
 logger = logging.getLogger('ship')
 
 class ship(gameObject):
    def __init__(self, position = sc([0, 0, 0])):
-
+      self.inventory = items.inventory()
       self.modules = {
          "radio": commands.radio(),
          "thrust_front": commands.thrusters(self, np.array([0.0, 0.0, -100000.0])),
@@ -23,7 +24,7 @@ class ship(gameObject):
          "radar": commands.radar(self),
          "crew": commands.crew(self),
          "generator": commands.generator(self, 25000000),
-         "cargo" : commands.cargo(),
+         "cargo" : commands.cargo(self),
          "laser": commands.laser(self),
       }
 

@@ -6,9 +6,9 @@ import player
 logger = logging.getLogger('cargo')
 
 class cargo():
-   def __init__(self):
-       self.inventory = items.inventory()
-
+   def __init__(self, ship):
+      self.inventory = ship.inventory
+   
    def parse(self, args):
       commands = {
       "list":self.list_items,
