@@ -32,7 +32,7 @@ class laser():
          return self.help()
 
       if target == self.ship:
-         return player.response.ok, "The turret likes the crew of this ship and refusese to shoot it self."
+         return player.response.ok, "The turret likes the crew of this ship and refusese to shoot itself."
 
       halfing_distance = 10000 # Power of the laser will half every 10 km
       distance = self.ship.getDistanceTo(target)
