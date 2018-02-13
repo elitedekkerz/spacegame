@@ -9,36 +9,36 @@ logger = logging.getLogger("ship info")
 
 #return received arguments excluding the first one
 class ship_info():
-   def __init__(self, ship):
-      self.ship = ship
+    def __init__(self, ship):
+        self.ship = ship
 
-   def parse(self, args):
-      commands = {
-      "position":self.getPosition,
-      "velocity":self.getVelocity,
-      "heading":self.getHeading,
-      "power":self.getPower,
-      }
-      try:
-         return commands[args[1]](args)
-      except:
-         logging.exception("exception when running command")
-         return player.response.usage, "ship position/velocity/heading/power"
+    def parse(self, args):
+        commands = {
+        "position":self.getPosition,
+        "velocity":self.getVelocity,
+        "heading":self.getHeading,
+        "power":self.getPower,
+        }
+        try:
+            return commands[args[1]](args)
+        except:
+            logging.exception("exception when running command")
+            return player.response.usage, "ship position/velocity/heading/power"
 
-   def simulate(self, dt, power_factor):
-      pass
+    def simulate(self, dt, power_factor):
+        pass
 
-   def getPosition(self, args):
-      return player.response.ok, str(self.ship.position)
+    def getPosition(self, args):
+        return player.response.ok, str(self.ship.position)
 
-   def getVelocity(self, args):
-      return player.response.ok,  str(self.ship.velocity)
-      
-   def getHeading(self, args):
-      try:
-        return player.response.ok, str(self.ship.heading.rotate(np.array([0.0, 0.0, 1.0])))
-      except:
-        logger.exception("Heading")
+    def getVelocity(self, args):
+        return player.response.ok,  str(self.ship.velocity)
+        
+    def getHeading(self, args):
+        try:
+          return player.response.ok, str(self.ship.heading.rotate(np.array([0.0, 0.0, 1.0])))
+        except:
+          logger.exception("Heading")
 
-   def getPower(self, args):
-      return str(self.ship.power_needed / 1000) + "/" + str(self.ship.power_generated / 1000) + " kW"
+    def getPower(self, args):
+        return str(self.ship.power_needed / 1000) + "/" + str(self.ship.power_generated / 1000) + " kW"
