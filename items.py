@@ -125,5 +125,8 @@ class item_type(object):
 game_items = {
     "uranium":item_type(19100, "Can be used as fuel"),
     "gold":item_type(19300, "Shiny"),
+    "iron":item_type(7874, "Looks more like rust"),
+    "ice":item_type(917, "Ice ice baby"),
+    "stone":item_type(2500, "Just pile of rubble"),
     "space_pistol":item_type(1, "Pew Pew", countable=True)
 }

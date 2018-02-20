@@ -1,6 +1,7 @@
 #!/usr/bin/python3 -i
 import server
 import gameObject
+import asteroid
 import logging
 import numpy as np
 import time
@@ -13,7 +14,7 @@ s.start()
 #Create asteroids in 100 km radius 
 for i in range(100):
     pos = (np.random.rand(3) - 0.5) * 100000
-    newAsteroid = gameObject.gameObject("ast", pos)
+    newAsteroid = asteroid.asteroid(pos)
 
 #stop server before quitting
 atexit.register(s.stop)
