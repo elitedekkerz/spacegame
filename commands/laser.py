@@ -34,12 +34,16 @@ class laser():
         if target == self.ship:
             return player.response.ok, "The turret likes the crew of this ship and refusese to shoot itself."
 
-        halfing_distance = 10000 # Power of the laser will half every 10 km
+        halfing_distance = 1000 # Power of the laser will half every 1 km
         distance = self.ship.getDistanceTo(target)
         times_halved = distance / halfing_distance
         power = self.charge / 2 ** times_halved
 
-        return player.response.ok, "Laser hit target with {} J of energy".format(power)
+        try:
+            ret = target.hit(self.ship, power)
+            return player.response.ok, ret
+        except:
+           return player.response.ok, "Laser hits target with {} J of energy, but nothing happens.".format(power)
 
     def status(self, args):
         charge_lvl = self.charge / self.full_charge * 100
