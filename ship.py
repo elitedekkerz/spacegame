@@ -12,7 +12,7 @@ logger = logging.getLogger('ship')
 
 class ship(gameObject):
     def __init__(self, position = sc([0, 0, 0])):
-        self.inventory = items.inventory()
+        super().__init__("ship", position)
         self.modules = {
             "radio": commands.radio(),
             "thrust_front": commands.thrusters(self, np.array([0.0, 0.0, -100000.0])),
@@ -33,8 +33,7 @@ class ship(gameObject):
         #Vector for telling  where ship is going
         self.velocity = np.array([0.0, 0.0, 0.0])
         self.thrust_acc = np.array([0.0, 0.0, 0.0])
-
-        super().__init__("ship", position)
+  
 
     def simulate(self, dt):
             

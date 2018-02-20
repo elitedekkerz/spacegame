@@ -3,6 +3,7 @@ import numpy as np
 import logging
 from pyquaternion import Quaternion
 from space_coordinate import space_coordinate as sc
+import items
 
 id_count = 0
 objects = []
@@ -15,6 +16,7 @@ class gameObject(object):
       else:
          self.position = sc(pos)
 
+      self.inventory = items.inventory()
       self.identifier = id_prefix + "-" + "%06i"%id_count
       self.mass = mass
       self.heading = Quaternion()
