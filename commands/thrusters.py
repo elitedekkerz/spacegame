@@ -25,7 +25,7 @@ class thrusters():
             return player.response.usage, "thruster set {float = 0.0 - 1.0}"
 
     def simulate(self, dt, power_factor):
-        self.ship.thrust_acc += self.thruster_power / self.ship.mass * self.set_value * power_factor
+        self.ship.thrust_acc += self.thruster_power / self.ship.get_mass() * self.set_value * power_factor
 
     def set(self, args):
         try:

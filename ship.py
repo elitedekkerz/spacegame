@@ -71,3 +71,6 @@ class ship(gameObject):
             return 1.0
         else:
             return self.power_generated / self.power_needed
+
+    def get_mass(self):
+        return self.inventory.get_mass() + 100000

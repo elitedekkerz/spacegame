@@ -18,7 +18,6 @@ class gameObject(object):
 
       self.inventory = items.inventory()
       self.identifier = id_prefix + "-" + "%06i"%id_count
-      self.mass = mass
       self.heading = Quaternion()
       id_count += 1
       global objects
@@ -75,3 +74,6 @@ class gameObject(object):
 
    def getHeading(self):
       return self.heading.rotate([0.0, 0.0, 1.0])
+
+   def get_mass(self):
+      return self.inventory.get_mass()

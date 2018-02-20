@@ -120,7 +120,7 @@ class radar():
         if isinstance(target, gameObject.gameObject):
             dist, azimuth, inclination = self.ship.getSphericalCoordinateTo(target, inDeg = True)
             result = "{}: {:06.3E} {:+06.1f} {:+06.1f}\n".format(target.identifier, dist, azimuth, inclination)
-            result += "mass: {:06.3E}\n".format(target.mass)
+            result += "mass: {:06.3E}\n".format(target.get_mass())
             result += "heading: "+ str(target.getHeading())
         else:
             return player.response.error, "unknown target"

@@ -38,10 +38,10 @@ class rudder():
         #If no rotation is set go dampening mode 
         if(np.linalg.norm(self.axis_set) < 0.0001 and self.dampening_p != 0):
             damp_set = -np.clip(self.axis_speed, -1.0, 1.0) * self.dampening_p
-            acc = (self.axis_power * damp_set) / (self.ship.mass * 100)
+            acc = (self.axis_power * damp_set) / (self.ship.get_mass() * 100)
         else:
             #axial accelration: a = F/(mr), assume ship is sphere with 100 radius
-            acc = (self.axis_power * self.axis_set) / (self.ship.mass * 100)
+            acc = (self.axis_power * self.axis_set) / (self.ship.get_mass() * 100)
 
         self.axis_speed += acc * dt * power_factor
         axis_pos = self.axis_speed * dt
