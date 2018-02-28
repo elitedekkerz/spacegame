@@ -6,6 +6,19 @@ class inventory(object):
     def __init__(self):
         self.inventory = []
 
+    def __iter__(self):
+        self.iter_index = 0
+        return self
+
+    def __next__(self):
+        if self.iter_index < len(self.inventory):
+            result = self.inventory[self.iter_index]
+        else:
+            raise StopIteration
+
+        self.iter_index += 1
+        return result
+
     #Insert an item to the invenotry
     def insert(self, item):
         for inv_item in self.inventory:
