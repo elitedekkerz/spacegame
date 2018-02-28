@@ -31,7 +31,25 @@ class asteroid(gameObject):
         self.position += sc(dpos)
 
     def hit(self, source, power):
-        ret = "Asteroid {} got hit with {} J of energy from {}".format(self.identifier, power, source.identifier)
+        ret = "Asteroid {} got hit with {:.0E} J of energy from {}.\n".format(self.identifier, power, source.identifier)
         logger.debug(ret)
+
+        hit = power / self.get_mass()
+        logger.debug("Hit = {}".format(hit))
+
+        if hit > 10:
+            for slot in self.inventory:
+                loot = slot.split(slot.count * (hit / 100.0))
+                source.inventory.insert(loot)
+
+        if hit < 10:
+            ret += "Laser was too weak to pentrate the surface of the asteroid."
+        elif hit < 50:
+            ret += "Small chunk broke from the asteroid."
+        elif hit < 100:
+            ret += "Half of the asteroid is now missing."
+        else:
+            ret += "The whole asteroid pulverized in instant."
+            self.remove()
 
         return ret
