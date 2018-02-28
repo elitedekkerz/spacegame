@@ -30,7 +30,7 @@ class cargo():
             else:
                 output = "Cargo manifest:\n"
                 for item in items:
-                    output += "{:40s}{}\n".format(item[0], item[1])
+                    output += "{:40s}{: 10.3f}\n".format(item[0], item[1])
 
         except:
             return self.help()
@@ -73,7 +73,7 @@ class cargo():
 
     def get_mass(self, args):
         mass = self.inventory.get_mass()
-        reply = "Total mass of the invetory is {} kg.".format(mass)
+        reply = "Total mass of the invetory is {:.3f} kg.".format(mass)
         return player.response.ok, reply
 
     def help(self):
