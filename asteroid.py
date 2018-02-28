@@ -14,11 +14,11 @@ class asteroid(gameObject):
         self.velocity = np.array([0.0, 0.0, 0.0])
         self.thrust_acc = np.array([0.0, 0.0, 0.0])
 
-        self.inventory.insert(items.item("ice", np.random.rand() * 100000)) 
-        self.inventory.insert(items.item("iron", np.random.rand() * 1000))
-        self.inventory.insert(items.item("gold", np.random.rand() * 1000))
-        self.inventory.insert(items.item("stone", np.random.rand() * 100000))
-        self.inventory.insert(items.item("uranium", np.random.rand() * 10))
+        self.inventory.insert(items.item("ice", np.random.rand() * 100000.0)) 
+        self.inventory.insert(items.item("iron", np.random.rand() * 1000.0))
+        self.inventory.insert(items.item("gold", np.random.rand() * 1000.0))
+        self.inventory.insert(items.item("stone", np.random.rand() * 100000.0))
+        self.inventory.insert(items.item("uranium", np.random.rand() * 10.0))
 
     def simulate(self, dt):
             

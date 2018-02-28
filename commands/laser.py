@@ -11,7 +11,7 @@ class laser():
          self.ship = ship
          self.charge = 0
          self.charge_rate = 0
-         self.full_charge = 50000000 # 50MJ
+         self.full_charge = 50000000000 # 50 GJ
 
     def parse(self, args):
         commands = {
@@ -51,7 +51,7 @@ class laser():
 
     def charge_cmd(self, args):
         try:
-            charge_rate = np.clip(float(args[2]), 0, 10000000)
+            charge_rate = np.clip(float(args[2]), 0, 1000000000)
             self.charge_rate = charge_rate
             return player.response.ok, "Charging laser at rate of {} J/s.".format(charge_rate)
         except:
