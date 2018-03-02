@@ -9,3 +9,4 @@ from .crew import crew
 from .generator import generator
 from .cargo import cargo
 from .laser import laser
+from .shield import shield

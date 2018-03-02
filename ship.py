@@ -26,6 +26,7 @@ class ship(gameObject):
             "generator": commands.generator(self, 1000000000),
             "cargo" : commands.cargo(self),
             "laser": commands.laser(self),
+            "shield": commands.shield(self),
         }
 
         self.name = 'Восток'
@@ -75,3 +76,29 @@ class ship(gameObject):
 
     def get_mass(self):
         return self.inventory.get_mass() + 100000
+    
+    def destroy(self):
+        logger.info("Ship {} has been destroyed".format(self.name))
+
+        for player in self.crew:
+            player.client.sendMessage("Your ship has been destroyed")
+            player.client.stop()
+
+        self.remove()
+
+    def hit(self, source, power):
+        ret = "{} got hit with {:.0E} J of energy from {}.\n".format(self.identifier, power, source.identifier)
+        logger.info(ret)
+
+        shield = 0
+        try:
+            shield = self.modules["shield"].hit(power)
+        except:
+            pass
+
+        if shield == 0:
+            self.destroy()
+            return  "Your laser goes trough {} shields and penetrates its hull. The target is destoryed".format(self.identifier)
+        else:
+            return "The hit is absorbed by the ships shield. Their shield is now at {:.0f} %.".format(shield)
+           
