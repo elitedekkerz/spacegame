@@ -29,6 +29,7 @@ class ship(gameObject):
         }
 
         self.name = 'Восток'
+        self.inventory.insert(items.item("uranium", 10.0))
 
         #Vector for telling  where ship is going
         self.velocity = np.array([0.0, 0.0, 0.0])
