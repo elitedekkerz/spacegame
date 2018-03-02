@@ -32,7 +32,7 @@ class asteroid(gameObject):
 
     def hit(self, source, power):
         ret = "Asteroid {} got hit with {:.0E} J of energy from {}.\n".format(self.identifier, power, source.identifier)
-        logger.debug(ret)
+        logger.info(ret)
 
         hit = power / self.get_mass()
         logger.debug("Hit = {}".format(hit))
