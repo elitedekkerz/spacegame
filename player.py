@@ -28,6 +28,7 @@ class player():
             'join': self.joinShip,
             'name': self.setName,
             'echo': self.echo,
+            'help': self.printHelp,
             }
 
         #add player to game
@@ -65,6 +66,13 @@ class player():
         self.updatePrompt()
         self.log.info('changed name to %s', self.name)
         return response.ok, 'your name is now {}'.format(self.name)
+
+    def printHelp(self, arg):
+        msg  = "disconnect           Disconnects form server\n"
+        msg += "join <ship_name>     Joins to a ship (creates it if it doesn't exsist)\n"
+        msg += "name <name>          Change player name\n"
+        msg += "help                 This help"
+        return response.ok, msg
 
     def joinShip(self, name):
         '''add self to ship'''
@@ -115,7 +123,10 @@ class player():
                 message = [message]
 
             #try to find a matching command
-            if message[0] in self.commands:
+            if self.ship and message[0] == 'help':
+                reply = self.ship.print_help(message)
+                status = response.ok
+            elif message[0] in self.commands:
                 status, reply = self.commands[message[0]](message)
             elif self.ship and  message[0] in self.ship.modules:
                 status, reply = self.ship.modules[message[0]].parse(message)

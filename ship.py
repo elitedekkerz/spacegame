@@ -101,4 +101,10 @@ class ship(gameObject):
             return  "Your laser goes trough {} shields and penetrates its hull. The target is destoryed".format(self.identifier)
         else:
             return "The hit is absorbed by the ships shield. Their shield is now at {:.0f} %.".format(shield)
-           
+
+    def print_help(self, msg):
+        msg = "Modules:\n"
+        for module in self.modules:
+            msg += module + "\n"
+
+        return msg
