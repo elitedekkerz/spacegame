@@ -4,15 +4,14 @@ import items
 import player
 import gameObject
 
-logger = logging.getLogger('shield')
-
 class shield():
     def __init__(self, ship):
-         self.ship = ship
-         self.charge = 0
-         self.charge_rate = 0
-         self.full_charge = 50000000000 # 50 GJ
-         self.upkeep = 100000 #kW
+        self.log = logging.getLogger("shield")
+        self.ship = ship
+        self.charge = 0
+        self.charge_rate = 0
+        self.full_charge = 50000000000 # 50 GJ
+        self.upkeep = 100000 #kW
 
     def parse(self, args):
         commands = {
@@ -22,7 +21,7 @@ class shield():
         try:
             return commands[args[1]](args)
         except:
-            logger.exception('incorrect command %s', str.join(' ', args))
+            self.log.info("Unknown command given: {}".format(' '.join(args)))
             return self.help()
 
 
@@ -41,8 +40,10 @@ class shield():
             return self.help 
 
     def help(self):
-        usage = "shield charge <max_charge_rate>\n"
-        usage += "shield status\n"
+        usage = (
+            "shield charge <max_charge_rate>\n"
+            "shield status\n"
+        )
         return player.response.usage, usage
 
     def getPowerNeeded(self):

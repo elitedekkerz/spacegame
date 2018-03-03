@@ -9,6 +9,7 @@ import logging
 #return received arguments excluding the first one
 class radar():
     def __init__(self, ship):
+        self.log = logging.getLogger("radar")
         self.ship = ship
         
         #Scan distance of the radar 
@@ -34,10 +35,17 @@ class radar():
         try:
             return commands[args[1]](args)
         except:
-            logging.exception('Radar exception')
-            return player.response.usage, ("radar scan/sector/on/off/identify\n"
-                    "output format:\n"
-                    "identifier: <range>(meters) <elevation>(degrees) <azimuth>(degrees)\n")
+            self.log.info("Unknown command given: {}".format(' '.join(args)))
+            return self.help()
+
+    def help(self):
+        usage = (
+            "radar (on | off)\n"
+            "radar scan\n"
+            "radar sector <sector_size>\n"
+            "radar identify\n"
+        )
+        return player.response.usage, usage
 
     def simulate(self, dt, power_factor):
         self.power_factor = power_factor
@@ -83,7 +91,7 @@ class radar():
         except IndexError:
             return player.response.ok, "{0}".format(self.sector)
         except:
-            logging.exception("exception when setting sector value")
+            self.log.exception("exception when setting sector value")
             return player.response.ok, "Expected {float = 1.0 ... 180.0}"
 
     def powerOn(self, args):

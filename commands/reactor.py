@@ -2,10 +2,9 @@ import logging
 import player
 import numpy as np
 
-logger = logging.getLogger('reactor')
-
 class reactor():
     def __init__(self, ship, power):
+        self.log = logging.getLogger("reactor")
         #Maximum power generated in watts
         self.max_power_output = power
         self.reactor_level = 0.0
@@ -21,7 +20,7 @@ class reactor():
         try:
             return commands[args[1]](args)
         except:
-            logger.debug('incorrect command %s', str.join(' ', args))
+            self.log.info("Unknown command given: {}".format(' '.join(args)))
             return self.help()
 
     def set(self, args):
@@ -44,11 +43,11 @@ class reactor():
 
         self.reactor_level = new_level
 
-        logger.info("Rector is set to %s", self.reactor_level)
+        self.log.info("Rector is set to %s", self.reactor_level)
         return player.response.ok, "reactor is now set to {:.0f} %.".format(new_level * 100.0)
 
     def get(self, args):
-        logger.debug('rector info requested')
+        self.log.debug('rector info requested')
 
         slots = self.ship.inventory.find("uranium")
         if len(slots) == 0:
@@ -64,8 +63,11 @@ class reactor():
         return player.response.ok, reply
 
     def help(self):
-        usage =  "reactor set <value>\n"
-        usage += "reactor status\n"
+        usage = (
+            "reactor set <value>\n"
+            "reactor status\n"
+        )
+
         return player.response.usage, usage
 
     def simulate(self, dt, power_factor):

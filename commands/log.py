@@ -1,11 +1,11 @@
 import logging
 import player
-logger = logging.getLogger('log')
 
 class log():
     data = ''
 
     def __init__(self, size=1024):
+        self.log = logging.getLogger("log")
         self.size = size
 
     def parse(self, args):
@@ -17,7 +17,7 @@ class log():
         try:
             return commands[args[1]](args)
         except:
-            logger.debug('incorrect command %s', str.join(' ', args))
+            self.log.info("Unknown command given: {}".format(' '.join(args)))
             return self.help()
 
     def write(self,args):
@@ -27,7 +27,7 @@ class log():
             self.data = (self.data+inData)[-self.size:]
         else:
             self.data += inData
-        logger.info('log updated: %s', inData[:-1])
+        self.log.info('log updated: %s', inData[:-1])
         return player.response.ok, ''
 
     def read(self,args):
@@ -35,11 +35,16 @@ class log():
 
     def clear(self,args):
         self.data = ''
-        logger.info('log cleared')
+        self.log.info('log cleared')
         return player.response.ok, 'log cleared'
 
     def help(self):
-        return player.response.usage, "log <write <message>/read/clear>"
+        usage = (
+            "log write\n"
+            "log read\n"
+            "log write <message>\n"
+        )
+        return player.response.usage, usage
 
     def simulate(self, dt, power_factor):
         pass
