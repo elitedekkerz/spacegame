@@ -23,7 +23,7 @@ class ship(gameObject):
             "time": commands.timer(),
             "radar": commands.radar(self),
             "crew": commands.crew(self),
-            "generator": commands.generator(self, 1000000000),
+            "reactor": commands.reactor(self, 1000000000),
             "cargo" : commands.cargo(self),
             "laser": commands.laser(self),
             "shield": commands.shield(self),
