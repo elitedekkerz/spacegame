@@ -25,7 +25,7 @@ class reactor():
 
     def set(self, args):
         try:
-            new_level = np.clip(float(args[2]), 0 , 1)
+            new_level = np.clip(float(args[2]), 0 , 100)
         except:
             return self.help()
 
@@ -41,10 +41,10 @@ class reactor():
         if len(slots) == 0:
             return player.response.ok, "Can't turn on the reactor. You are out of uranium."
 
-        self.reactor_level = new_level
+        self.reactor_level = new_level / 100.0
 
-        self.log.info("Rector is set to %s", self.reactor_level)
-        return player.response.ok, "reactor is now set to {:.0f} %.".format(new_level * 100.0)
+        self.log.info("Rector is set to {:.0f}".format(new_level))
+        return player.response.ok, "reactor is now set to {:.0f} %.".format(new_level)
 
     def get(self, args):
         self.log.debug('rector info requested')
@@ -64,7 +64,7 @@ class reactor():
 
     def help(self):
         usage = (
-            "reactor set <value>\n"
+            "reactor set <percentage>\n"
             "reactor status\n"
         )
 
