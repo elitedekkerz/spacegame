@@ -5,39 +5,99 @@ import player
 
 class thrusters():
 
-    def __init__(self, ship, power_vect):
-        #thruster names and their values
+    def __init__(self, ship):
+        self.log = logging.getLogger("thruster")
         self.ship = ship
-        self.thruster_power = power_vect
-        self.set_value = 0.0
 
-        #Watts needed for 1 newton
-        self.power_consumption = 50
+        self.thruster_list = (
+            thruster([0.0, 0.0, -100000.0], "front"),
+            thruster([0.0, 0.0,  100000.0], "back"),
+            thruster([0.0, -100000.0, 0.0], "top"),
+            thruster([0.0,  100000.0, 0.0], "bottom"),
+            thruster([-100000.0, 0.0, 0.0], "right"),
+            thruster([ 100000.0, 0.0, 0.0], "left"),
+        )
+
 
     def parse(self, args):
         commands = {
-        "set":self.set,
-        "get":self.get,
+            "front":self.setCmd,
+            "back":self.setCmd,
+            "top":self.setCmd,
+            "bottom":self.setCmd,
+            "left":self.setCmd,
+            "rigth":self.setCmd,
+            "off":self.offCmd,
+            "status":self.statusCmd,
         }
         try:
             return commands[args[1]](args)
         except:
-            return player.response.usage, "thruster set {float = 0.0 - 1.0}"
+            self.log.info("Unknown command given: {}".format(' '.join(args)))
+            return self.help()
+
+    def help(self):
+        usage = (
+            "thruster (front | back | top | bottom | left | right) <percantage>\n"
+            "thruster off\n"
+            "thruster status\n"
+        )
+        return player.response.usage, usage
 
     def simulate(self, dt, power_factor):
-        self.ship.thrust_acc += self.thruster_power / self.ship.get_mass() * self.set_value * power_factor
+        thrust = np.array([0.0,0.0,0.0])
+        for thruster in self.thruster_list:
+            thrust += thruster.get_thrust_vector()
 
-    def set(self, args):
+        self.ship.thrust_acc += thrust / self.ship.get_mass() * power_factor
+
+    def setCmd(self, args):
         try:
-            val = np.clip(float(args[2]), 0, 1)
-            self.set_value = val
-            return player.response.ok, "{0} thruster set to: {1}".format(args[2], val)
+            for thruster in self.thruster_list:
+                if thruster.name == args[1]:
+                    return thruster.set_value(args[2])
         except:
-            logging.exception("exception when setting thruster value")
-            return player.response.usage, "set thruster <name> {float = 0.0 - 1.0}"
+            return self.help()
+    
+    def offCmd(self, args):
+        for thruster in self.thruster_list:
+            thruster.set_value(0)
+        return player.response.ok, "All thrusters are turned off"
 
-    def get(self, args):
-        return player.response.ok, str(self.set_value)
+    def statusCmd(self, args):
+        msg = ""
+        for thruster in self.thruster_list:
+            thrust = np.linalg.norm(thruster.get_thrust_vector()) 
+            msg += "Truster {} set to {:.0f} % producing {:.0f} N of thrust.\n".format(thruster.name, thruster.value * 100, thrust)
+
+        return player.response.ok, msg
 
     def getPowerNeeded(self):
-        return self.set_value * self.power_consumption * np.linalg.norm(self.thruster_power)
+        usage = 0.0
+        for thruster in self.thruster_list:
+            usage += thruster.power_usage()
+
+        return usage
+
+
+
+class thruster():
+    def __init__(self, vector, name):
+        self.thrust_vector = np.array(vector)
+        self.value = 0
+        self.name = name
+        self.max_power_usage = np.linalg.norm(self.thrust_vector)
+
+        #Watts needed for 1 newton
+        self.power_consumption = 50
+        
+    def set_value(self, string):
+        val = np.clip(float(string), 0, 100)
+        self.value = val / 100.0
+        return player.response.ok, "{} thruster set to {:.0f} %.".format(self.name, val)
+
+    def power_usage(self):
+        return self.max_power_usage * self.value * self.power_consumption
+
+    def get_thrust_vector(self):
+        return self.thrust_vector * self.value

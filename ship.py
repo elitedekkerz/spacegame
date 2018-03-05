@@ -15,8 +15,7 @@ class ship(gameObject):
         super().__init__("ship", position)
         self.modules = {
             "radio": commands.radio(),
-            "thrust_front": commands.thrusters(self, np.array([0.0, 0.0, -100000.0])),
-            "thrust_back": commands.thrusters(self, np.array([0.0, 0.0, 500000.0])),
+            "thruster": commands.thrusters(self),
             "rudder": commands.rudder(self, np.array([100000.0, 100000.0, 100000.0])),
             "ship": commands.ship_info(self),
             "log": commands.log(),
