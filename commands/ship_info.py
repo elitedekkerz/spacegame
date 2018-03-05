@@ -18,12 +18,25 @@ class ship_info():
         "velocity":self.getVelocity,
         "heading":self.getHeading,
         "power":self.getPower,
+        "cheat":self.getCheatInfo,
         }
         try:
             return commands[args[1]](args)
         except:
             logging.exception("exception when running command")
             return player.response.usage, "ship position/velocity/heading/power"
+
+    def getCheatInfo(self, args):
+        reply = ''
+        values = {
+            'position':self.ship.position,
+            'velocity':self.ship.velocity,
+            'heading':self.ship.heading,
+            'acceleration':self.ship.getAcceleration()
+            }      
+        for name, value in values.items():
+            reply += name + ': ' + str(value) + '\n'
+        return player.response.ok, reply
 
     def simulate(self, dt, power_factor):
         pass
