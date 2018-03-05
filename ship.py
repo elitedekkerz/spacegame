@@ -45,10 +45,7 @@ class ship(gameObject):
         for module in self.modules:
             self.modules[module].simulate(dt, power_factor)
 
-        #acceleration = np.array([0.0, 0.0, 0.0])
-        acceleration = self.heading.rotate(self.thrust_acc)
-
-        self.velocity += acceleration * dt
+        self.velocity += self.getAcceleration() * dt
         dpos = self.velocity * dt
         self.position += sc(dpos)
 
@@ -76,6 +73,9 @@ class ship(gameObject):
 
     def get_mass(self):
         return self.inventory.get_mass() + 100000
+
+    def getAcceleration(self):
+        return self.heading.rotate(self.thrust_acc)
     
     def destroy(self):
         logger.info("Ship {} has been destroyed".format(self.name))
