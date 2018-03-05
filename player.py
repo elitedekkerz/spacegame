@@ -1,6 +1,7 @@
 from types import *
 import logging
 
+import json
 import ship
 import gameObject
 
@@ -8,9 +9,9 @@ players = []
 playerIDCounter = 0
 
 class response():
-    ok = 'Ok\n'
-    error = 'Error\n'
-    usage = 'Usage\n'
+    ok = 'Ok'
+    error = 'Error'
+    usage = 'Usage'
 
 class player():
     '''process data received from client'''
@@ -21,6 +22,7 @@ class player():
         #game variables
         self.name = 'Yuri'
         self.ship = None
+        self.outputJson = False
 
         #player commands
         self.commands = {
@@ -29,6 +31,7 @@ class player():
             'name': self.setName,
             'echo': self.echo,
             'help': self.printHelp,
+            'json': self.changeJson,
             }
 
         #add player to game
@@ -66,12 +69,26 @@ class player():
         self.updatePrompt()
         self.log.info('changed name to %s', self.name)
         return response.ok, 'your name is now {}'.format(self.name)
+    
+    def changeJson(self, value):
+        '''Change output format'''
+        if value[1] == 'on':
+            self.outputJson = True
+            return response.ok, 'using json output format'
+        if value[1] == 'off':
+            self.outputJson = False
+            return response.ok, 'using standard output format'
+
+        return response.error, "json on -> use json. json off -> use standard" 
 
     def printHelp(self, arg):
-        msg  = "disconnect           Disconnects form server\n"
-        msg += "join <ship_name>     Joins to a ship (creates it if it doesn't exsist)\n"
-        msg += "name <name>          Change player name\n"
-        msg += "help                 This help"
+        msg  = (
+            "disconnect           Disconnects form server\n"
+            "join <ship_name>     Joins to a ship (creates it if it doesn't exsist)\n"
+            "name <name>          Change player name\n"
+            "json (on | off)      Enable or disable json output format"
+            "help                 This help"
+        )
         return response.ok, msg
 
     def joinShip(self, name):
@@ -122,6 +139,7 @@ class player():
             else:
                 message = [message]
 
+            dir = None
             #try to find a matching command
             if self.ship and message[0] == 'help':
                 reply = self.ship.print_help(message)
@@ -135,4 +153,12 @@ class player():
                 reply = 'unknown command'
 
             #reply to player
-            self.client.sendMessage('{}{}{}'.format(status,reply ,self.prompt).encode('utf-8'))
+            if self.outputJson:
+                if self.ship:
+                    ship = self.ship.name
+                else:
+                    ship = None
+                json_data = {"status" : status, "name":self.name, "ship":ship, "text": reply, "data": dir}
+                self.client.sendMessage(''.join((json.dumps(json_data), '\n')).encode('utf-8'))
+            else:
+                self.client.sendMessage('{}{}{}'.format(''.join((status, '\n')),reply ,self.prompt).encode('utf-8'))
