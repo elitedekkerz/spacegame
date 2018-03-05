@@ -53,7 +53,7 @@ class ship_info():
           self.log.exception("Heading")
 
     def getPower(self, args):
-        return str(self.ship.power_needed / 1000) + "/" + str(self.ship.power_generated / 1000) + " kW"
+        return player.response.ok, str(self.ship.power_needed / 1000) + "/" + str(self.ship.power_generated / 1000) + " kW"
 
     def help(self):
         usage = (
