@@ -85,7 +85,7 @@ class server():
                 self.log.warning('method %s call taking too long to match tick rate (%s > %s)', method.__name__, simulationTime, 1/self.tickRate)
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.debug)
+    logging.basicConfig(level=logging.DEBUG)
     s = server()
     s.start()
     while True:
