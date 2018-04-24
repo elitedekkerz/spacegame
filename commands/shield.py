@@ -4,15 +4,15 @@ import items
 import player
 import gameObject
 
-logger = logging.getLogger('shield')
-
 class shield():
     def __init__(self, ship):
-         self.ship = ship
-         self.charge = 0
-         self.charge_rate = 0
-         self.full_charge = 50000000000 # 50 GJ
-         self.upkeep = 100000 #kW
+        self.log = logging.getLogger("shield")
+        self.ship = ship
+        self.charge = 0
+        self.charge_rate = 0
+        self.max_charge_rate = 1000000000 # 100 MW
+        self.full_charge = 50000000000 # 50 GJ
+        self.upkeep = 100000 #kW
 
     def parse(self, args):
         commands = {
@@ -22,27 +22,29 @@ class shield():
         try:
             return commands[args[1]](args)
         except:
-            logger.exception('incorrect command %s', str.join(' ', args))
+            self.log.info("Unknown command given: {}".format(' '.join(args)))
             return self.help()
 
 
     def status(self, args):
         shield_lvl = self.charge / self.full_charge * 100
-        resp = "Shield is at {:.0f} % and is using {:.0f} W of power.\n".format(shield_lvl, self.power - self.heat_energy)
+        resp = "Shield is at {:.0f} %% and is using {:.0f} W of power.\n".format(shield_lvl, self.power - self.heat_energy)
         resp += "The rest {} W is turned to heat.".format(self.heat_energy)
         return player.response.ok, resp
 
     def charge_cmd(self, args):
         try:
-            charge_rate = np.clip(float(args[2]), 0, 100000000)
-            self.charge_rate = charge_rate
-            return player.response.ok, "Giving shields {} W of power.".format(self.charge_rate)
+            charge_rate = np.clip(float(args[2]), 0, 100)
+            self.charge_rate = (charge_rate / 100.0) * self.max_charge_rate
+            return player.response.ok, "Shield charge rate is set to {:.0f} %. That gives shields {:.0f} W of power.".format(charge_rate, self.charge_rate)
         except:
             return self.help 
 
     def help(self):
-        usage = "shield charge <max_charge_rate>\n"
-        usage += "shield status\n"
+        usage = (
+            "shield charge <percentage>\n"
+            "shield status\n"
+        )
         return player.response.usage, usage
 
     def getPowerNeeded(self):

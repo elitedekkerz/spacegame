@@ -2,10 +2,9 @@ import logging
 import player
 import numpy as np
 
-logger = logging.getLogger('generator')
-
-class generator():
+class reactor():
     def __init__(self, ship, power):
+        self.log = logging.getLogger("reactor")
         #Maximum power generated in watts
         self.max_power_output = power
         self.reactor_level = 0.0
@@ -21,12 +20,12 @@ class generator():
         try:
             return commands[args[1]](args)
         except:
-            logger.debug('incorrect command %s', str.join(' ', args))
+            self.log.info("Unknown command given: {}".format(' '.join(args)))
             return self.help()
 
     def set(self, args):
         try:
-            new_level = np.clip(float(args[2]), 0 , 1)
+            new_level = np.clip(float(args[2]), 0 , 100)
         except:
             return self.help()
 
@@ -40,15 +39,15 @@ class generator():
 
         slots = self.ship.inventory.find("uranium")
         if len(slots) == 0:
-            return player.response.ok, "Can't turn on the generator. You are out of uranium."
+            return player.response.ok, "Can't turn on the reactor. You are out of uranium."
 
-        self.reactor_level = new_level
+        self.reactor_level = new_level / 100.0
 
-        logger.info("rector set to %s", self.reactor_level)
-        return player.response.ok, "Generator is now set to {:.0f} %.".format(new_level * 100.0)
+        self.log.info("Rector is set to {:.0f}".format(new_level))
+        return player.response.ok, "reactor is now set to {:.0f} %.".format(new_level)
 
     def get(self, args):
-        logger.debug('rector info requested')
+        self.log.debug('rector info requested')
 
         slots = self.ship.inventory.find("uranium")
         if len(slots) == 0:
@@ -57,15 +56,18 @@ class generator():
         if self.reactor_level == 0:
             return player.response.ok, "Reactor is offline."
 
-        reply = "Reactor is set to {:.0f} %".format(self.reactor_level * 100.0)
+        reply = "Reactor is running at {:.0f} %".format(self.reactor_level * 100.0)
         power = (self.reactor_level * self.max_power_output / 1000)
         uranium = self.fuel_rate * (power / 1000) 
         reply += " and generates {:.0f} kW of power by using {:.3f} grams of uranium per second.".format(power, uranium * 1000)
         return player.response.ok, reply
 
     def help(self):
-        usage =  "generator set <value>\n"
-        usage += "generator status\n"
+        usage = (
+            "reactor set <percentage>\n"
+            "reactor status\n"
+        )
+
         return player.response.usage, usage
 
     def simulate(self, dt, power_factor):

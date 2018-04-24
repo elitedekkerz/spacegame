@@ -11,10 +11,9 @@ Usage:
 import logging
 import player
 
-logger = logging.getLogger('radio')
-
 class radio():
     def __init__(self):
+        self.log = logging.getLogger("radio")
         self.volume = 0
 
     def parse(self, args):
@@ -27,7 +26,7 @@ class radio():
         try:
             return commands[args[1]](args)
         except:
-            logger.debug('incorrect command %s', str.join(' ', args))
+            self.log.info("Unknown command given: {}".format(' '.join(args)))
             return self.usage()
 
     def on(self,args):
@@ -41,7 +40,7 @@ class radio():
         try:
             newVolume = float(args[2])
         except:
-            logger.info('who doesn\'t know how to work a radio?')
+            self.log.info('who doesn\'t know how to work a radio?')
             return player.response.ok, "Radio 'set' function needs one argumet as float"
 
         #do some fancy calculations
@@ -55,11 +54,11 @@ class radio():
         else:
             reply = 'You try to adjust the radio, but nothing happens.'
 
-        logger.info("volume set to %s", self.volume)
+        self.log.info("volume set to %s", self.volume)
         return player.response.ok, reply
 
     def get(self, args):
-        logger.debug('volume info requested')
+        self.log.debug('volume info requested')
         reply = 'the radio is '
         if self.volume > 1:
             reply += 'on fire'

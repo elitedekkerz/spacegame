@@ -1,9 +1,9 @@
 import logging
 import player
-logger = logging.getLogger('crew')
 
 class crew():
     def __init__(self, ship):
+        self.log = logging.getLogger("crew")
         self.ship = ship
         self.ship.crew = []
 
@@ -19,7 +19,7 @@ class crew():
                 return player.response.ok, reply
             return self.help()
         except:
-            logger.exception('unable to parse')
+            self.log.exception('unable to parse')
             return self.help()
 
     def help(self):

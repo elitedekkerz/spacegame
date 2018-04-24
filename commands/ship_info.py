@@ -5,11 +5,10 @@ import logging
 from space_coordinate import space_coordinate as sc
 import player
 
-logger = logging.getLogger("ship info")
-
 #return received arguments excluding the first one
 class ship_info():
     def __init__(self, ship):
+        self.log = logging.getLogger("ship_info")
         self.ship = ship
 
     def parse(self, args):
@@ -23,8 +22,8 @@ class ship_info():
         try:
             return commands[args[1]](args)
         except:
-            logging.exception("exception when running command")
-            return player.response.usage, "ship position/velocity/heading/power"
+            self.log.info("Unknown command given: {}".format(' '.join(args)))
+            return self.help()
 
     def getCheatInfo(self, args):
         reply = ''
@@ -51,7 +50,16 @@ class ship_info():
         try:
           return player.response.ok, str(self.ship.heading.rotate(np.array([0.0, 0.0, 1.0])))
         except:
-          logger.exception("Heading")
+          self.log.exception("Heading")
 
     def getPower(self, args):
-        return str(self.ship.power_needed / 1000) + "/" + str(self.ship.power_generated / 1000) + " kW"
+        return player.response.ok, str(self.ship.power_needed / 1000) + "/" + str(self.ship.power_generated / 1000) + " kW"
+
+    def help(self):
+        usage = (
+            "ship position\n"
+            "ship velocity\n"
+            "ship heading\n"
+            "ship power\n"
+        )
+        return player.response.usage, usage

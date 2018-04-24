@@ -4,14 +4,15 @@ import items
 import player
 import gameObject
 
-logger = logging.getLogger('laser')
-
 class laser():
     def __init__(self, ship):
-         self.ship = ship
-         self.charge = 0
-         self.charge_rate = 0
-         self.full_charge = 50000000000 # 50 GJ
+        self.log = logging.getLogger("laser")
+
+        self.ship = ship
+        self.charge = 0
+        self.charge_rate = 0
+        self.max_charge_rate = 1000000000 # 100 MW
+        self.full_charge = 50000000000 # 50 GJ
 
     def parse(self, args):
         commands = {
@@ -22,7 +23,7 @@ class laser():
         try:
             return commands[args[1]](args)
         except:
-            logger.exception('incorrect command %s', str.join(' ', args))
+            self.log.info("Unknown command given: {}".format(' '.join(args)))
             return self.help()
 
     def fire(self, args):
@@ -51,16 +52,19 @@ class laser():
 
     def charge_cmd(self, args):
         try:
-            charge_rate = np.clip(float(args[2]), 0, 1000000000)
-            self.charge_rate = charge_rate
-            return player.response.ok, "Charging laser at rate of {} J/s.".format(charge_rate)
+            rate = np.clip(float(args[2]), 0, 100)
+            self.charge_rate = (rate / 100.0) * self.max_charge_rate
+            return player.response.ok, "Laser charge rate is set to {:.0f} % and is using {:.0f} J/s".format(rate, self.charge_rate)
+
         except:
             return self.help 
 
     def help(self):
-        usage = "laser fire <target>\n"
-        usage += "laser charge <max_charge_rate>\n"
-        usage += "laser status\n"
+        usage = (
+            "laser fire <target>\n"
+            "laser charge <percentage>\n"
+            "laser status\n"
+        )
         return player.response.usage, usage
 
     def getPowerNeeded(self):

@@ -6,7 +6,7 @@ from .log import log
 from .timer import timer
 from .radar import radar
 from .crew import crew
-from .generator import generator
+from .reactor import reactor
 from .cargo import cargo
 from .laser import laser
 from .shield import shield

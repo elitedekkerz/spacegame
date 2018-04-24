@@ -3,10 +3,9 @@ import numpy as np
 import items
 import player
 
-logger = logging.getLogger('cargo')
-
 class cargo():
     def __init__(self, ship):
+        self.log = logging.getLogger("cargo")
         self.inventory = ship.inventory
     
     def parse(self, args):
@@ -19,7 +18,7 @@ class cargo():
         try:
             return commands[args[1]](args)
         except:
-            logger.debug('incorrect command %s', str.join(' ', args))
+            self.log.info("Unknown command given: {}".format(' '.join(args)))
             return self.help()
 
     def list_items(self, args):
@@ -40,11 +39,11 @@ class cargo():
     def give(self, args):
         item_name = args[2]
         amount = float(args[3])
-        logger.info('Player give {} {}'.format(amount, item_name))
+        self.log.info('Player give {} {}'.format(amount, item_name))
         try:
             item = items.item(item_name, amount)
         except:
-            logger.info("Player requested item that doesn't exist: {}".format(item_name))
+            self.log.info("Player requested item that doesn't exist: {}".format(item_name))
             return player.response.ok, "There is no such thing as \"{}\" in the universe".format(item_name)
         self.inventory.insert(item)
         reply = "{} {} added to your inventory, you dirty little cheater.".format(amount, item_name)
@@ -77,10 +76,12 @@ class cargo():
         return player.response.ok, reply
 
     def help(self):
-        usage = "cargo list\n"
-        usage += "cargo mass\n"
-        usage += "cargo give <item> <amount>\n"
-        usage += "cargo dump <item> <amount>\n"
+        usage = (
+            "cargo list\n"
+            "cargo mass\n"
+            "cargo give <item> <amount>\n"
+            "cargo dump <item> <amount>\n"
+        )
         return player.response.usage, usage
 
     def simulate(self, dt, power_factor):
