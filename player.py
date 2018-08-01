@@ -43,7 +43,12 @@ class player():
 
         #send client some confirmation that they have connected
         self.updatePrompt()
-        self.client.sendMessage(self.prompt.encode('utf-8'))
+        try:
+            with open('./motd.txt', 'r') as f:
+                motd = f.read()
+        except FileNotFoundError:
+            motd = ''
+        self.client.sendMessage((motd+self.prompt).encode('utf-8'))
         self.log.info('ready')
 
     def disconnect(self, message = ['', 'unknown']):
